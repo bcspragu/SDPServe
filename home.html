@@ -32,7 +32,7 @@ $(function(){
 
   // Establish a WebSocket connection
   if (window["WebSocket"]) {
-      conn = new WebSocket("ws://{{ .Host }}/ws");
+      conn = new WebSocket("ws://bsprague.com/sdp/ws");
       conn.onerror = function(evt) {
         console.log(evt);
       }
