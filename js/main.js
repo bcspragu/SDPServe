@@ -1,11 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>BeatBeam</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.2/raphael-min.js"></script>
-<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-<script type="text/javascript">
 // RaphaelJS objects
 var canvas;
 var paper;
@@ -13,17 +5,12 @@ var paper;
 // WebSocket object
 var conn;
 
-// Parameters from server
-var XCOUNT = {{ .XCount }};
-var YCOUNT = {{ .YCount }};
-
 // Local map
 var blocks = new Array(XCOUNT);
 for (var i = 0; i < XCOUNT; i++) {
   blocks[i] = new Array(YCOUNT);
 }
 
-var start_grid = JSON.parse("{{ .Grid }}");
 
 $(function(){
   // Set the canvas
@@ -32,7 +19,7 @@ $(function(){
 
   // Establish a WebSocket connection
   if (window["WebSocket"]) {
-      conn = new WebSocket("ws://bsprague.com/sdp/ws");
+      conn = new WebSocket("ws://localhost:8080/ws");
       conn.onerror = function(evt) {
         console.log(evt);
       }
@@ -43,6 +30,7 @@ $(function(){
         var data = JSON.parse(evt.data);
         var x = data.x;
         var y = data.y;
+        var grid = data.grid;
 
         setBlock(data.x, data.y, data.on);
       }
@@ -50,7 +38,6 @@ $(function(){
       // Your browser does not support WebSockets
   }
 
-  // conn.send(msg.val());
   drawCanvas();
   initState();
   $(window).resize(drawCanvas);
@@ -93,7 +80,7 @@ function drawCanvas() {
                                       // Toggle on
                                       var on = !this.data('on');
                                       setBlock(x,y,on)
-                                      conn.send(JSON.stringify({x: x, y: y, on: on}));
+                                      conn.send(JSON.stringify({x: x, y: y, on: on, grid: 0}));
                                     }
                                   })
                                   .touchstart(function(e) {
@@ -104,7 +91,7 @@ function drawCanvas() {
                                       // Toggle on
                                       var on = !this.data('on');
                                       setBlock(x,y,on)
-                                      conn.send(JSON.stringify({x: x, y: y, on: on}));
+                                      conn.send(JSON.stringify({x: x, y: y, on: on, grid: 0}));
                                     }
                                   });
         } else {
@@ -131,23 +118,7 @@ function setBlock(x, y, state) {
 function initState() {
   for (var i = 0; i < XCOUNT; i++) {
     for (var j = 0; j < XCOUNT; j++) {
-      setBlock(i, j, start_grid[i][j]);
+      setBlock(i, j, start_grid[0][i][j]);
     }
   }
 }
-</script>
-<style type="text/css">
-html, body, #canvas {
-    overflow: hidden;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    background: black;
-}
-</style>
-</head>
-<body>
-  <div id="canvas"></div>
-</body>
-</html>

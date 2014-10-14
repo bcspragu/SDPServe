@@ -5,7 +5,7 @@
 package main
 
 import (
-  "encoding/json"
+	"encoding/json"
 	"flag"
 	"log"
 	"net/http"
@@ -13,13 +13,15 @@ import (
 )
 
 const (
-  XSize = 10
-  YSize = 10
+	GridCount = 3
+	XSize     = 10
+	YSize     = 10
 )
 
 var addr = flag.String("addr", ":8080", "http service address")
-var homeTempl = template.Must(template.ParseFiles("home.html"))
-var grid [XSize][YSize]bool;
+
+var templates = template.Must(template.ParseGlob("templates/*"))
+var grid [GridCount][XSize][YSize]bool
 
 func serveHome(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
@@ -31,26 +33,35 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-  gridString, _ := json.Marshal(grid)
-  data := struct {
-    XCount int
-    YCount int
-    Host string
-    Grid string
-  } {
-    XSize,
-    YSize,
-    r.Host,
-    string(gridString),
-  }
-	homeTempl.Execute(w, data)
+	gridString, _ := json.Marshal(grid)
+	data := struct {
+		XCount    int
+		YCount    int
+		GridCount int
+		Host      string
+		Grid      string
+	}{
+		GridCount,
+		XSize,
+		YSize,
+		r.Host,
+		string(gridString),
+	}
+	err := templates.ExecuteTemplate(w, "home.html", data)
+	if err != nil {
+		log.Println("Error executing template:", err)
+	}
 }
 
 func main() {
 	flag.Parse()
 	go h.run()
+
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/ws", serveWs)
+	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./js"))))
+	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
+
 	err := http.ListenAndServe(*addr, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

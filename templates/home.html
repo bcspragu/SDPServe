@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>BeatBeam</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<link type="text/css" rel="stylesheet" href="/css/main.css">
+<script src="/js/raphael.min.js"></script>
+<script src="/js/jquery.min.js"></script>
+<script type="text/javascript">
+  // Parameters from server
+  var start_grid = JSON.parse("{{ .Grid }}");
+  var XCOUNT = {{ .XCount }};
+  var YCOUNT = {{ .YCount }};
+  var GRIDCOUNT = {{ .GridCount }};
+</script>
+<script src="js/main.js"></script>
+</head>
+<body>
+  <div id="canvas"></div>
+  <div id="mini-hud"></div>
+</body>
+</html>

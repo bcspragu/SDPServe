@@ -28,9 +28,9 @@ const ( // Time allowed to write a message to the peer.
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-  CheckOrigin: func (r *http.Request) bool {
-    return true
-  },
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 // connection is an middleman between the websocket connection and the hub.
@@ -43,9 +43,10 @@ type connection struct {
 }
 
 type block struct {
-  On bool `json:"on"`
-  X int   `json:"x"`
-  Y int   `json:"y"`
+	On   bool `json:"on"`
+	X    int  `json:"x"`
+	Y    int  `json:"y"`
+	Grid int  `json:"grid"`
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -89,11 +90,11 @@ func (c *connection) writePump() {
 			if err := c.write(websocket.TextMessage, message); err != nil {
 				return
 			}
-      res := &block{}
-      if err := json.Unmarshal(message, &res); err != nil {
-        return
-      }
-      grid[res.X][res.Y] = res.On
+			res := &block{}
+			if err := json.Unmarshal(message, &res); err != nil {
+				return
+			}
+			grid[res.Grid][res.X][res.Y] = res.On
 		case <-ticker.C:
 			if err := c.write(websocket.PingMessage, []byte{}); err != nil {
 				return
