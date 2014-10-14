@@ -14,3 +14,9 @@ html, body{
 #mini-hud {
   height: 20%;
 }
+
+#mini1, #mini2, #mini3 {
+  width: 33.33%;
+  height: 100%;
+  float: left;
+}

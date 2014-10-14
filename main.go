@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	GridCount = 3
+	GridCount = 4
 	XSize     = 10
 	YSize     = 10
 )
@@ -41,9 +41,9 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 		Host      string
 		Grid      string
 	}{
-		GridCount,
 		XSize,
 		YSize,
+		GridCount,
 		r.Host,
 		string(gridString),
 	}

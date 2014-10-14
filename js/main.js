@@ -1,21 +1,30 @@
-// RaphaelJS objects
-var canvas;
-var paper;
-
 // WebSocket object
 var conn;
 
 // Local map
-var blocks = new Array(XCOUNT);
-for (var i = 0; i < XCOUNT; i++) {
-  blocks[i] = new Array(YCOUNT);
+var papers = new Array(GRIDCOUNT);
+var canvases = new Array(GRIDCOUNT);
+var colors = ["red", "orange", "green", "blue"];
+var grids = new Array(GRIDCOUNT);
+
+for (var i = 0; i < GRIDCOUNT; i++) {
+  grids[i] = new Array(XCOUNT);
+  for (var j = 0; j < XCOUNT; j++) {
+    grids[i][j] = new Array(YCOUNT);
+  }
 }
 
 
 $(function(){
   // Set the canvas
-  canvas = $("#canvas");
-  paper = Raphael(canvas.get(0), "100%", "100%");
+  canvases[0] = $("#canvas");
+  canvases[1] = $("#mini1");
+  canvases[2] = $("#mini2");
+  canvases[3] = $("#mini3");
+  papers[0] = Raphael(canvases[0].get(0), "100%", "100%");
+  papers[1] = Raphael(canvases[1].get(0), "100%", "100%");
+  papers[2] = Raphael(canvases[2].get(0), "100%", "100%");
+  papers[3] = Raphael(canvases[3].get(0), "100%", "100%");
 
   // Establish a WebSocket connection
   if (window["WebSocket"]) {
@@ -28,25 +37,31 @@ $(function(){
       }
       conn.onmessage = function(evt) { // Message received. evt.data is something
         var data = JSON.parse(evt.data);
-        var x = data.x;
-        var y = data.y;
-        var grid = data.grid;
 
-        setBlock(data.x, data.y, data.on);
+        setBlock(data.grid, data.x, data.y, data.on);
       }
   } else {
       // Your browser does not support WebSockets
   }
 
-  drawCanvas();
+  drawCanvas(0);
+  drawCanvas(1);
+  drawCanvas(2);
+  drawCanvas(3);
   initState();
-  $(window).resize(drawCanvas);
+  $(window).resize(function() {
+    drawCanvas(0, "red");
+    drawCanvas(1, "orange");
+    drawCanvas(2, "yellow");
+    drawCanvas(3, "green");
+  });
 });
 
-function drawCanvas() {
+function drawCanvas(grid) {
   // Subtract the spacing so we don't butt up against the right/bottom edge
-  var width = canvas.width();
-  var height = canvas.height();
+  var width = canvases[grid].width();
+  var height = canvases[grid].height();
+  var paper = papers[grid];
 
   var size;
   var spacing
@@ -64,8 +79,8 @@ function drawCanvas() {
 
   for (var i = 0; i < XCOUNT; i++) {
     for (var j = 0; j < YCOUNT; j++) {
-      if (typeof blocks[i][j] === "undefined") {
-        blocks[i][j] = paper.rect(i * (size + extra_x) + spacing,
+      if (typeof grids[grid][i][j] === "undefined") {
+        grids[grid][i][j] = paper.rect(i * (size + extra_x) + spacing,
                                   j * (size + extra_y) + spacing,
                                   size + extra_x - spacing,
                                   size + extra_y - spacing)
@@ -79,8 +94,8 @@ function drawCanvas() {
                                       var y = this.data('y');
                                       // Toggle on
                                       var on = !this.data('on');
-                                      setBlock(x,y,on)
-                                      conn.send(JSON.stringify({x: x, y: y, on: on, grid: 0}));
+                                      setBlock(grid,x,y,on);
+                                      conn.send(JSON.stringify({x: x, y: y, on: on, grid: grid}));
                                     }
                                   })
                                   .touchstart(function(e) {
@@ -90,12 +105,12 @@ function drawCanvas() {
                                       var y = this.data('y');
                                       // Toggle on
                                       var on = !this.data('on');
-                                      setBlock(x,y,on)
-                                      conn.send(JSON.stringify({x: x, y: y, on: on, grid: 0}));
+                                      setBlock(grid,x,y,on);
+                                      conn.send(JSON.stringify({x: x, y: y, on: on, grid: grid}));
                                     }
                                   });
         } else {
-          var block = blocks[i][j];
+          var block = grids[grid][i][j];
           block.attr({x: i * (size + extra_x) + spacing,
                       y: j * (size + extra_y) + spacing,
                       width: size + extra_x - spacing,
@@ -105,10 +120,10 @@ function drawCanvas() {
   }
 }
 
-function setBlock(x, y, state) {
-  var block = blocks[x][y];
+function setBlock(grid, x, y, state) {
+  var block = grids[grid][x][y];
   if (state) {
-    block.attr({fill: 'red'});
+    block.attr({fill: colors[grid]});
   } else {
     block.attr({fill: 'white'});
   }
@@ -116,9 +131,11 @@ function setBlock(x, y, state) {
 }
 
 function initState() {
-  for (var i = 0; i < XCOUNT; i++) {
+  for (var i = 0; i < GRIDCOUNT; i++) {
     for (var j = 0; j < XCOUNT; j++) {
-      setBlock(i, j, start_grid[0][i][j]);
+      for (var k = 0; k < YCOUNT; k++) {
+        setBlock(i, j, k, start_grid[i][j][k]);
+      }
     }
   }
 }
