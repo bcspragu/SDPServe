@@ -27,7 +27,7 @@ $(function () {
 
   $('.main-grid').on('touchstart', function (evt) {
     evt.preventDefault();
-    var touches = evt.originalEvent.touches;
+    var touches = evt.originalEvent.changedTouches;
     for (var i = 0; i < touches.length; i++) {
       var touch = $(touches[i].target);
 
