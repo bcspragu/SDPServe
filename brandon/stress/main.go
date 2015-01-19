@@ -8,7 +8,8 @@ import (
 	"time"
 )
 
-const WorkerCount = 10
+// Simulate 20 people using it at once
+const WorkerCount = 20
 
 type block struct {
 	On   bool   `json:"on"`
@@ -17,11 +18,9 @@ type block struct {
 	Name string `json:"name"`
 }
 
-// Here's the worker, of which we'll run several
-// concurrent instances. These workers will receive
-// work on the `jobs` channel and send the corresponding
-// results on `results`. We'll sleep a second per job to
-// simulate an expensive task.
+// Here's the worker, of which we'll run several concurrent instances. Each
+// worker will periodically make requests to the site to simulate users
+// playing with it
 func worker(done chan<- bool) {
 	// First connect to the WebSocket server
 	dialer := websocket.DefaultDialer
@@ -37,7 +36,8 @@ func worker(done chan<- bool) {
 	defer conn.Close()
 	go readLoop(conn)
 
-	ticker := time.NewTicker(time.Millisecond * 50)
+	// Tick regularly somewhere between every 25 and 75 ms
+	ticker := time.NewTicker(time.Millisecond * time.Duration(rand.Int63n(51)+25))
 
 	for _ = range ticker.C {
 		if err := conn.WriteJSON(randomBlock()); err != nil {
