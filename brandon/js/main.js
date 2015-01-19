@@ -26,7 +26,7 @@ $(function () {
   });
 
   $('.main-grid').on('touchstart', function (evt) {
-    var touches = evt.touches;
+    var touches = evt.originalEvent.touches;
     for (var i = 0; i < touches.length; i++) {
       var touch = $(touches[i].target);
 
