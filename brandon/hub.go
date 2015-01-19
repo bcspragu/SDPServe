@@ -18,6 +18,9 @@ type hub struct {
 
 	// Unregister requests from connections.
 	unregister chan *connection
+
+	// Function to call every time we broadcast a message
+	hooks []func([]byte)
 }
 
 var h = hub{
@@ -25,6 +28,7 @@ var h = hub{
 	register:    make(chan *connection),
 	unregister:  make(chan *connection),
 	connections: make(map[*connection]bool),
+	hooks:       make([]func([]byte), 0),
 }
 
 func (h *hub) run() {
@@ -38,6 +42,9 @@ func (h *hub) run() {
 				close(c.send)
 			}
 		case m := <-h.broadcast:
+			for _, hook := range h.hooks {
+				hook(m)
+			}
 			for c := range h.connections {
 				select {
 				case c.send <- m:
@@ -48,4 +55,8 @@ func (h *hub) run() {
 			}
 		}
 	}
+}
+
+func (h *hub) addHook(newHook func([]byte)) {
+	h.hooks = append(h.hooks, newHook)
 }

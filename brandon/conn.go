@@ -5,14 +5,14 @@
 package main
 
 import (
-	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"time"
 )
 
-const ( // Time allowed to write a message to the peer.
+const (
+	// Time allowed to write a message to the peer.
 	writeWait = 10 * time.Second
 
 	// Time allowed to read the next pong message from the peer.
@@ -40,13 +40,6 @@ type connection struct {
 
 	// Buffered channel of outbound messages.
 	send chan []byte
-}
-
-type block struct {
-	On   bool `json:"on"`
-	X    int  `json:"x"`
-	Y    int  `json:"y"`
-	Grid int  `json:"grid"`
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -90,11 +83,6 @@ func (c *connection) writePump() {
 			if err := c.write(websocket.TextMessage, message); err != nil {
 				return
 			}
-			res := &block{}
-			if err := json.Unmarshal(message, &res); err != nil {
-				return
-			}
-			grid[res.Grid][res.X][res.Y] = res.On
 		case <-ticker.C:
 			if err := c.write(websocket.PingMessage, []byte{}); err != nil {
 				return

@@ -1,68 +1,64 @@
-// Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package main
 
 import (
 	"encoding/json"
-	"flag"
 	"log"
 	"net/http"
-	"text/template"
+	"os"
 )
 
-const (
-	GridCount = 4
-	XSize     = 10
-	YSize     = 10
-)
+var gridSignatures = []gridDef{
+	{10, 10, "Piano", "#2ecc71"},
+	{10, 10, "Drums", "#3498db"},
+	{10, 10, "Guitar", "#e74c3c"},
+	{10, 10, "Flute", "#d35400"},
+}
 
-var addr = flag.String("addr", ":8080", "http service address")
+type gridDef struct {
+	XSize int
+	YSize int
+	Name  string
+	Color string
+}
 
-var templates = template.Must(template.ParseGlob("templates/*"))
-var grid [GridCount][XSize][YSize]bool
+type block struct {
+	On   bool
+	X    int
+	Y    int
+	Name string
+}
 
-func serveHome(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.Error(w, "Not found", 404)
-		return
+var grids = make(map[string]Grid)
+
+func init() {
+	for _, sig := range gridSignatures {
+		grids[sig.Name] = NewGrid(sig.XSize, sig.YSize)
 	}
-	if r.Method != "GET" {
-		http.Error(w, "Method not allowed", 405)
-		return
-	}
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	gridString, _ := json.Marshal(grid)
-	data := struct {
-		XCount    int
-		YCount    int
-		GridCount int
-		Host      string
-		Grid      string
-	}{
-		XSize,
-		YSize,
-		GridCount,
-		r.Host,
-		string(gridString),
-	}
-	err := templates.ExecuteTemplate(w, "home.html", data)
-	if err != nil {
-		log.Println("Error executing template:", err)
-	}
+
+	h.addHook(func(message []byte) {
+		res := &block{}
+		if err := json.Unmarshal(message, &res); err != nil {
+			return
+		}
+		grids[res.Name][res.X][res.Y] = res.On
+	})
 }
 
 func main() {
-	flag.Parse()
 	go h.run()
 
 	http.HandleFunc("/", serveHome)
+	http.HandleFunc("/css/main.css", serveCss)
 	http.HandleFunc("/ws", serveWs)
-	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./js"))))
-	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 
-	err := http.ListenAndServe(*addr, nil)
+	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./js"))))
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+
+	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}

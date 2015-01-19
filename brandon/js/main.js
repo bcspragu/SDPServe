@@ -1,34 +1,159 @@
-// WebSocket object
+// jQuery objects holding our various grids
+var mainGrid;
+// Holder for each of the minigrids
+var miniGrids;
+
+// Websocket object
 var conn;
 
-// Local map
-var papers = new Array(GRIDCOUNT);
-var canvases = new Array(GRIDCOUNT);
-var colors = ["red", "orange", "green", "blue"];
-var grids = new Array(GRIDCOUNT);
+var fadeTime = 250;
 
-for (var i = 0; i < GRIDCOUNT; i++) {
-  grids[i] = new Array(XCOUNT);
-  for (var j = 0; j < XCOUNT; j++) {
-    grids[i][j] = new Array(YCOUNT);
+$(function () {
+  mainGrid = $('.main-grid');
+  miniGrids = $('.mini-grids');
+
+  $(window).resize(resizeGrids);
+
+  initWebsockets();
+
+  $('.main-grid').on('click', '.cell', function () {
+    var cell = $(this);
+    
+    // Cell is on
+    var on = !cell.hasClass('active');
+
+    cell.toggleClass('active', fadeTime);
+
+    // Our x location is our index in the row
+    var xLoc = cell.index();
+    // Our y location is our row's index in the grid
+    var yLoc = cell.parents('.row').index();
+
+    var name = cell.parents('.grid').data('name');
+
+    // Build the message from various DOM attributes
+    var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name});
+    conn.send(message);
+  });
+
+  $('.mini-grids').on('click', '.mini-grid', function () {
+    // Switch this minigrid with the full-size grid
+    swapGrids($(this), mainGrid);
+  });
+
+  // Load up all of the grids
+  loadGrids(startGrid);
+});
+
+jQuery.fn.extend({
+  // Given a name and 2D array of booleans, initialize a DOM element as a
+  // grid
+  loadGrid: function (gridName, gridData) {
+    // Selector should only have a single element
+    var gridHolder = $(this[0]);
+
+    // Store the name of the grid on the holder
+    gridHolder.data("name", gridName);
+    gridHolder.addClass(nameToClass(gridName));
+    
+    // We need the length, width, and x/y sizes to compute the size of each
+    // individual cell
+    var width = gridHolder.width();
+    var height = gridHolder.height();
+
+    var xSize = gridData.length;
+    var ySize = gridData[0].length;
+
+    for (var i = 0; i < ySize; i++) {
+      // Create a new row, add it to the DOM, size it appropriately
+      var row = $('<div class="row"></div>');
+      gridHolder.append(row);
+
+      for (var j = 0; j < xSize; j++) {
+        // Create a new cell, add it to the DOM row, size it appropriately
+        var cell = $('<div class="cell"></div>');
+        row.append(cell);
+        // If this cell is active, make it active
+        if (gridData[j][i]) {
+          cell.addClass('active', fadeTime);
+        }
+      }
+    }
+    gridHolder.resizeCells();
+  },
+  // Set the status of a block on a given grid
+  setBlock: function (x, y, on) {
+    var gridHolder = $(this[0]);
+
+    // We can locate the cell with the jQuery equals selector, the cell we
+    // want is the zero-indexed xth column and yth row
+    var cell = gridHolder
+                 .find('.row:eq(' + y + ')')
+                 .find('.cell:eq(' + x + ')');
+
+   // Turn the cell on or off
+   if (on) {
+     cell.addClass('active', fadeTime);
+   } else {
+     cell.removeClass('active', fadeTime);
+   }
+  },
+  // Sets the size of the cells relative to the size of the given grid
+  resizeCells: function () {
+    var gridHolder = $(this[0]);
+
+    var width = gridHolder.width();
+    var height = gridHolder.height();
+
+    // Margin is 5px for main grid, 2px for mini grid
+    var margin = gridHolder.hasClass("mini-grid") ? 2 : 5;
+
+    // The number of rows is the number of divs with the class row
+    var rowCount = gridHolder.find('.row').length
+    // The number of cells per row should be the same in a given grid, so we
+    // find the number of divs with the class cell in the first row we find
+    var cellCount = gridHolder.find('.row:first .cell').length
+
+    gridHolder.find('.row').height(Math.floor(height/rowCount - margin));
+    gridHolder.find('.cell').width(Math.floor(width/cellCount - margin));
+  }
+});
+
+// Initialize our grids. The first grid takes up the large main grid area, and all subsequent grids get spread out along the bottom
+function loadGrids(gridData) {
+  // Clear out anything in there
+  mainGrid.empty();
+  miniGrids.empty();
+
+  // Start at -1 because the first one goes in the main grid
+  var miniGridCount = -1;
+  for (var gridName in gridData) {
+    if (gridData.hasOwnProperty(gridName)) {
+      miniGridCount++;
+    }
+  }
+
+  var isMainGrid = true;
+  for (var gridName in gridData) {
+    if (gridData.hasOwnProperty(gridName)) {
+      // Fill the main grid first
+      if (isMainGrid) {
+        isMainGrid = false;
+        mainGrid.loadGrid(gridName, gridData[gridName]);
+      } else {
+        var miniGrid = $('<div class="mini-grid grid"></div>');
+        miniGrids.append(miniGrid);
+        miniGrid.width(miniGrids.width()/miniGridCount);
+        miniGrid.loadGrid(gridName, gridData[gridName]);
+      }
+    }
   }
 }
 
-
-$(function(){
-  // Set the canvas
-  canvases[0] = $("#canvas");
-  canvases[1] = $("#mini1");
-  canvases[2] = $("#mini2");
-  canvases[3] = $("#mini3");
-  papers[0] = Raphael(canvases[0].get(0), "100%", "100%");
-  papers[1] = Raphael(canvases[1].get(0), "100%", "100%");
-  papers[2] = Raphael(canvases[2].get(0), "100%", "100%");
-  papers[3] = Raphael(canvases[3].get(0), "100%", "100%");
-
+function initWebsockets() {
   // Establish a WebSocket connection
   if (window["WebSocket"]) {
-      conn = new WebSocket("ws://localhost:8080/ws");
+      conn = new WebSocket("ws://" + host + "/ws");
       conn.onerror = function(evt) {
         console.log(evt);
       }
@@ -36,106 +161,76 @@ $(function(){
         console.log(evt);
       }
       conn.onmessage = function(evt) { // Message received. evt.data is something
+        // Parse the JSON out of the data
         var data = JSON.parse(evt.data);
-
-        setBlock(data.grid, data.x, data.y, data.on);
+        // Select our grid by the name passed to us
+        var grid = $(nameAsCssClass(data.name));
+        // Use the other attributes to figure out which cell to set
+        grid.setBlock(data.x, data.y, data.on);
       }
   } else {
       // Your browser does not support WebSockets
   }
+}
 
-  drawCanvas(0);
-  drawCanvas(1);
-  drawCanvas(2);
-  drawCanvas(3);
-  initState();
-  $(window).resize(function() {
-    drawCanvas(0, "red");
-    drawCanvas(1, "orange");
-    drawCanvas(2, "yellow");
-    drawCanvas(3, "green");
+// Resize all our grids to fill the new space. We first resize each of the
+// minigrids to fill their allocated space, CSS does the rest. Then we go
+// through each grid and make sure each row fills it's allocated height, and
+// each cell fills it's allocated width.
+function resizeGrids() {
+  // Grab all individual minigrids
+  var allMiniGrids = $('.mini-grid');
+
+  // The width of each minigrid is the space allocated for all of the
+  // minigrids divided by how many minigrids there are
+  allMiniGrids.width(miniGrids.width() / allMiniGrids.length);
+  
+  $('.grid').each(function () {
+    var gridHolder = $(this);
+    gridHolder.resizeCells();
   });
-});
-
-function drawCanvas(grid) {
-  // Subtract the spacing so we don't butt up against the right/bottom edge
-  var width = canvases[grid].width();
-  var height = canvases[grid].height();
-  var paper = papers[grid];
-
-  var size;
-  var spacing
-  var extra_x = 0;
-  var extra_y = 0;
-  if (width < height) {
-    spacing = Math.ceil(width / XCOUNT / 10);
-    size = Math.floor((width - spacing) / XCOUNT);
-    extra_y = Math.floor((height - YCOUNT * size - spacing) / YCOUNT);
-  } else {
-    spacing = Math.ceil(height / YCOUNT / 10);
-    size = Math.floor((height - spacing) / YCOUNT);
-    extra_x = Math.floor((width - XCOUNT * size - spacing) / XCOUNT);
-  }
-
-  for (var i = 0; i < XCOUNT; i++) {
-    for (var j = 0; j < YCOUNT; j++) {
-      if (typeof grids[grid][i][j] === "undefined") {
-        grids[grid][i][j] = paper.rect(i * (size + extra_x) + spacing,
-                                  j * (size + extra_y) + spacing,
-                                  size + extra_x - spacing,
-                                  size + extra_y - spacing)
-                                  .attr({fill: "white"})
-                                  .data('x', i)
-                                  .data('y', j)
-                                  .data('on', false)
-                                  .click(function() {
-                                    if (typeof conn !== "undefined") {
-                                      var x = this.data('x');
-                                      var y = this.data('y');
-                                      // Toggle on
-                                      var on = !this.data('on');
-                                      setBlock(grid,x,y,on);
-                                      conn.send(JSON.stringify({x: x, y: y, on: on, grid: grid}));
-                                    }
-                                  })
-                                  .touchstart(function(e) {
-                                    e.preventDefault();
-                                    if (typeof conn !== "undefined") {
-                                      var x = this.data('x');
-                                      var y = this.data('y');
-                                      // Toggle on
-                                      var on = !this.data('on');
-                                      setBlock(grid,x,y,on);
-                                      conn.send(JSON.stringify({x: x, y: y, on: on, grid: grid}));
-                                    }
-                                  });
-        } else {
-          var block = grids[grid][i][j];
-          block.attr({x: i * (size + extra_x) + spacing,
-                      y: j * (size + extra_y) + spacing,
-                      width: size + extra_x - spacing,
-                      height: size+ extra_y - spacing});
-        }
-    }
-  }
 }
 
-function setBlock(grid, x, y, state) {
-  var block = grids[grid][x][y];
-  if (state) {
-    block.attr({fill: colors[grid]});
-  } else {
-    block.attr({fill: 'white'});
-  }
-  block.data('on', state);
+// These next two functions abstract away math details about margins
+// TODO: Make the margin not hard-coded, maybe text/template for CSS?
+function rowHeight(totalHeight, numRows) {
+  // The floor() accounts for rounding errors and the minus 5 accounts
+  // for the bottom margin.
+  return Math.floor(totalHeight/numRows) - 5;
 }
 
-function initState() {
-  for (var i = 0; i < GRIDCOUNT; i++) {
-    for (var j = 0; j < XCOUNT; j++) {
-      for (var k = 0; k < YCOUNT; k++) {
-        setBlock(i, j, k, start_grid[i][j][k]);
-      }
-    }
-  }
+function cellWidth(totalWidth, numCells) {
+  // The floor() accounts for rounding errors and the minus 5 accounts
+  // for the right margin.
+  return Math.floor(totalWidth/numCells) - 5;
+}
+
+// A helper function for turning our instrument names into classes
+function nameToClass(name) {
+  return name.replace(" ", "-") + "-grid"
+}
+
+function nameAsCssClass(name) {
+  return "." + name.replace(" ", "-") + "-grid"
+}
+
+// Switch out the grids
+function swapGrids(grid1, grid2) {
+  var name1 = grid1.data('name');
+  var name2 = grid2.data('name');
+
+  grid1.removeClass(nameToClass(name1));
+  grid2.removeClass(nameToClass(name2));
+
+  grid1.addClass(nameToClass(name2));
+  grid2.addClass(nameToClass(name1));
+
+  grid1.data('name', name2);
+  grid2.data('name', name1);
+
+  var html1 = grid1.html();
+  grid1.html(grid2.html());
+  grid2.html(html1);
+
+  resizeGrids();
 }

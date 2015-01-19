@@ -7,16 +7,52 @@ html, body{
     background: black;
 }
 
-#canvas {
+
+.row {
+  width: 100%;
+}
+
+.cell {
+  height: 100%;
+  background-color: white;
+  float: left;
+}
+
+.main-grid {
   height: 80%;
+  margin-top: 5px;
+  margin-left: 5px;
 }
 
-#mini-hud {
+.main-grid > .row {
+  margin-bottom: 5px;
+}
+
+.main-grid > .row > .cell {
+  margin-right: 5px;
+}
+
+.mini-grids {
   height: 20%;
+  margin-left: 2px;
 }
 
-#mini1, #mini2, #mini3 {
-  width: 33.33%;
+.mini-grid {
   height: 100%;
   float: left;
 }
+
+.mini-grid > .row {
+  margin-bottom: 2px;
+}
+
+.mini-grid > .row > .cell {
+  margin-right: 2px;
+}
+
+{{ range $class, $color := .Colors }}
+{{$class}} .cell.active {
+  background-color: {{ $color }};
+}
+
+{{ end }}
