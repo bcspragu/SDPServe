@@ -7,7 +7,7 @@ var miniGrids;
 var conn;
 
 // Number of milliseconds for fade animation
-var fadeTime = 200;
+var fadeTime = 100;
 
 var miniMargin = 2;
 var mainMargin = 5;
