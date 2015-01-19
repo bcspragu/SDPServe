@@ -21,25 +21,20 @@ $(function () {
   initWebsockets();
 
   // When we click on the main grid, we want to update the grid locally and on the server
-  $('.main-grid').on('click touchstart', '.cell', function () {
-    var cell = $(this);
-    
-    // Cell is on
-    var on = !cell.hasClass('active');
+  $('.main-grid').on('click', '.cell', function () {
+    $(this).cellTrigger();
+  });
 
-    cell.toggleClass('active', fadeTime);
+  $('.main-grid').on('touchstart', function (evt) {
+    var touches = evt.touches;
+    for (var i = 0; i < touches.length; i++) {
+      var touch = $(touches[i].target);
 
-    // Our x location is our index in the row
-    var xLoc = cell.index();
-    // Our y location is our row's index in the grid
-    var yLoc = cell.parents('.row').index();
-
-    var name = cell.parents('.grid').data('name');
-
-    // Build the message from various DOM attributes
-    var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name});
-    // Send the message to the server via WebSockets
-    conn.send(message);
+      // If we didn't click on a cell, ignore it
+      if (touch.hasClass('cell')) {
+        touch.cellTrigger();
+      }
+    }
   });
 
   $('.mini-grids').on('click', '.mini-grid', function () {
@@ -122,6 +117,27 @@ jQuery.fn.extend({
 
     gridHolder.find('.row').height(Math.floor(height/rowCount) - margin);
     gridHolder.find('.cell').width(Math.floor(width/cellCount) - margin);
+  },
+  // Gets cell parent grid and coordinates and state, then sends it to server
+  cellTrigger: function () {
+    var cell = $(this[0]);
+    
+    // Cell is on
+    var on = !cell.hasClass('active');
+
+    cell.toggleClass('active', fadeTime);
+
+    // Our x location is our index in the row
+    var xLoc = cell.index();
+    // Our y location is our row's index in the grid
+    var yLoc = cell.parents('.row').index();
+
+    var name = cell.parents('.grid').data('name');
+
+    // Build the message from various DOM attributes
+    var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name});
+    // Send the message to the server via WebSockets
+    conn.send(message);
   }
 });
 
