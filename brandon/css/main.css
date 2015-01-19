@@ -30,7 +30,6 @@ html, body{
 
 .main-grid > .row > .cell {
   margin-right: 5px;
-  border-radius: 5px;
 }
 
 .mini-grids {
@@ -48,7 +47,6 @@ html, body{
 
 .mini-grid > .row > .cell {
   margin-right: 2px;
-  border-radius: 2px;
 }
 
 {{ range $class, $color := .Colors }}

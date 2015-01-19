@@ -21,7 +21,7 @@ $(function () {
   initWebsockets();
 
   // When we click on the main grid, we want to update the grid locally and on the server
-  $('.main-grid').on('click touchenter', '.cell', function () {
+  $('.main-grid').on('click touchstart', '.cell', function () {
     var cell = $(this);
     
     // Cell is on
