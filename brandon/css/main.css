@@ -19,7 +19,7 @@ html, body{
 }
 
 .main-grid {
-  height: 80%;
+  height: 75%;
   margin-top: 5px;
   margin-left: 5px;
 }
@@ -30,11 +30,11 @@ html, body{
 
 .main-grid > .row > .cell {
   margin-right: 5px;
+  border-radius: 5px;
 }
 
 .mini-grids {
-  height: 20%;
-  margin-left: 2px;
+  height: 25%;
 }
 
 .mini-grid {
@@ -48,6 +48,7 @@ html, body{
 
 .mini-grid > .row > .cell {
   margin-right: 2px;
+  border-radius: 2px;
 }
 
 {{ range $class, $color := .Colors }}

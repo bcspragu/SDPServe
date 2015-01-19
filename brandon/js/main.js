@@ -6,7 +6,11 @@ var miniGrids;
 // Websocket object
 var conn;
 
-var fadeTime = 250;
+// Number of milliseconds for fade animation
+var fadeTime = 200;
+
+var miniMargin = 2;
+var mainMargin = 5;
 
 $(function () {
   mainGrid = $('.main-grid');
@@ -16,7 +20,8 @@ $(function () {
 
   initWebsockets();
 
-  $('.main-grid').on('click', '.cell', function () {
+  // When we click on the main grid, we want to update the grid locally and on the server
+  $('.main-grid').on('click touchenter', '.cell', function () {
     var cell = $(this);
     
     // Cell is on
@@ -33,6 +38,7 @@ $(function () {
 
     // Build the message from various DOM attributes
     var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name});
+    // Send the message to the server via WebSockets
     conn.send(message);
   });
 
@@ -41,7 +47,7 @@ $(function () {
     swapGrids($(this), mainGrid);
   });
 
-  // Load up all of the grids
+  // Load up all of the grids at the start
   loadGrids(startGrid);
 });
 
@@ -106,16 +112,16 @@ jQuery.fn.extend({
     var height = gridHolder.height();
 
     // Margin is 5px for main grid, 2px for mini grid
-    var margin = gridHolder.hasClass("mini-grid") ? 2 : 5;
+    var margin = gridHolder.hasClass("mini-grid") ? miniMargin : mainMargin;
 
     // The number of rows is the number of divs with the class row
     var rowCount = gridHolder.find('.row').length
     // The number of cells per row should be the same in a given grid, so we
     // find the number of divs with the class cell in the first row we find
-    var cellCount = gridHolder.find('.row:first .cell').length
+    var cellCount = gridHolder.find('.row:first > .cell').length
 
-    gridHolder.find('.row').height(Math.floor(height/rowCount - margin));
-    gridHolder.find('.cell').width(Math.floor(width/cellCount - margin));
+    gridHolder.find('.row').height(Math.floor(height/rowCount) - margin);
+    gridHolder.find('.cell').width(Math.floor(width/cellCount) - margin);
   }
 });
 
@@ -143,7 +149,7 @@ function loadGrids(gridData) {
       } else {
         var miniGrid = $('<div class="mini-grid grid"></div>');
         miniGrids.append(miniGrid);
-        miniGrid.width(miniGrids.width()/miniGridCount);
+        miniGrid.width(Math.ceil(miniGrids.width()/miniGridCount) - miniMargin);
         miniGrid.loadGrid(gridName, gridData[gridName]);
       }
     }
@@ -183,26 +189,12 @@ function resizeGrids() {
 
   // The width of each minigrid is the space allocated for all of the
   // minigrids divided by how many minigrids there are
-  allMiniGrids.width(miniGrids.width() / allMiniGrids.length);
+  allMiniGrids.width(Math.ceil(miniGrids.width() / allMiniGrids.length) - miniMargin);
   
   $('.grid').each(function () {
     var gridHolder = $(this);
     gridHolder.resizeCells();
   });
-}
-
-// These next two functions abstract away math details about margins
-// TODO: Make the margin not hard-coded, maybe text/template for CSS?
-function rowHeight(totalHeight, numRows) {
-  // The floor() accounts for rounding errors and the minus 5 accounts
-  // for the bottom margin.
-  return Math.floor(totalHeight/numRows) - 5;
-}
-
-function cellWidth(totalWidth, numCells) {
-  // The floor() accounts for rounding errors and the minus 5 accounts
-  // for the right margin.
-  return Math.floor(totalWidth/numCells) - 5;
 }
 
 // A helper function for turning our instrument names into classes
