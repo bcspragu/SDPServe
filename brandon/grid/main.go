@@ -49,10 +49,10 @@ func main() {
 
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/grids.json", serveGrids)
-	http.HandleFunc("/css/main.css", serveCss)
 	http.HandleFunc("/ws", serveWs)
 
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./js"))))
+	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 
 	port := os.Getenv("PORT")
 	if port == "" {

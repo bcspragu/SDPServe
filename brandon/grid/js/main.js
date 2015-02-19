@@ -10,7 +10,7 @@ var conn;
 var fadeTime = 100;
 
 var miniMargin = 2;
-var mainMargin = 5;
+var mainMargin = 6;
 
 $(function () {
   mainGrid = $('.main-grid');
@@ -22,7 +22,13 @@ $(function () {
 
   // When we click on the main grid, we want to update the grid locally and on the server
   $('.main-grid').on('click', '.cell', function () {
+    $(this).ripple();
     $(this).cellTrigger();
+  });
+
+
+  $('.main-grid, .mini-grids').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', '.cell', function() {
+    $(this).removeClass('animated pulse');
   });
 
   $('.main-grid').on('touchstart', function (evt) {
@@ -99,6 +105,8 @@ jQuery.fn.extend({
    } else {
      cell.removeClass('active', fadeTime);
    }
+
+   cell.ripple();
   },
   // Sets the size of the cells relative to the size of the given grid
   resizeCells: function () {
@@ -139,6 +147,46 @@ jQuery.fn.extend({
     var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name});
     // Send the message to the server via WebSockets
     conn.send(message);
+  },
+  // Animates the cells around us when we're done
+  ripple: function () {
+    var cell = $(this[0]);
+    var gridHolder = cell.parents('.grid');
+
+    // Start our pulse
+    cell.addClass('animated pulse');
+    
+    var yCount = gridHolder.find('.row').length
+    // The number of cells per row should be the same in a given grid, so we
+    // find the number of divs with the class cell in the first row we find
+    var xCount = gridHolder.find('.row:first > .cell').length
+
+    // Our x location is our index in the row
+    var xLoc = cell.index();
+    // Our y location is our row's index in the grid
+    var yLoc = cell.parents('.row').index();
+
+    var furthest = Math.max(xCount-xLoc, yCount-yLoc);
+    for (var i = 0; i < 10; i++) {
+      (function (i) {
+        setTimeout(function () {
+          for (var x = -i; x <= i; x++) {
+            for (var y = -i; y <= i; y++) {
+              if ((x != 0 || y != 0)
+                  && (Math.abs(x) == i || Math.abs(y) == i)
+                  && xLoc+x >= 0
+                  && xLoc+x <= xCount
+                  && yLoc+y >= 0
+                  && yLoc+y <= yCount) {
+                var cell = gridHolder
+                             .find('.row:eq(' + (yLoc+y) + ')')
+                             .find('.cell:eq(' + (xLoc+x) + ')');
+                cell.addClass('animated pulse');
+              }
+            }
+          }
+      }, Math.pow(i,0.5)*100)})(i);
+    }
   }
 });
 

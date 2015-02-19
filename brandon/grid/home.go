@@ -21,11 +21,13 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	gridString, _ := json.Marshal(grids)
 	data := struct {
-		Host  string
-		Grids string
+		Host   string
+		Grids  string
+		Colors map[string]string
 	}{
 		r.Host,
 		string(gridString),
+		cssGridColors,
 	}
 	err := index.Execute(w, data)
 	if err != nil {

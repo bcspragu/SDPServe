@@ -14,6 +14,13 @@
   // Host also comes from server
   var host = "{{ .Host }}";
 </script>
+<style type="text/css">
+  {{ range $class, $color := .Colors }}
+    {{$class}} .cell.active {
+      background-color: {{ $color }};
+    }
+  {{ end }}
+</style>
 <script src="js/main.js"></script>
 </head>
 <body>
