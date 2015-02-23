@@ -99,6 +99,11 @@ jQuery.fn.extend({
                  .find('.row:eq(' + y + ')')
                  .find('.cell:eq(' + x + ')');
 
+   // Only start the ripple if we aren't already in that state
+   if ((cell.hasClass('active') && !on)
+       || (!cell.hasClass('active') && on)) {
+     cell.ripple();
+   }
    // Turn the cell on or off
    if (on) {
      cell.addClass('active', fadeTime);
@@ -106,7 +111,6 @@ jQuery.fn.extend({
      cell.removeClass('active', fadeTime);
    }
 
-   cell.ripple();
   },
   // Sets the size of the cells relative to the size of the given grid
   resizeCells: function () {
