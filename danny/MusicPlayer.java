@@ -22,10 +22,25 @@ public class MusicPlayer {
       Thread.sleep(3000);
       piano.playNotesFromChord("CMajor", "dm", 100, 3000);
       guitar.playChord("CMajor", "dm", 100, 3000);
+      Thread.sleep(3000);
+      piano.playNotesFromChord("CMajor", "F", 100, 3000);
+      guitar.playChord("CMajor", "F", 100, 3000);
+      Thread.sleep(3000);
+      piano.playNotesFromChord("CMajor", "C", 100, 3000);
+      guitar.playChord("CMajor", "C", 100, 3000);
+      Thread.sleep(3000);
+      piano.playNotesFromChord("CMajor", "em", 100, 3000);
+      guitar.playChord("CMajor", "em", 100, 3000);
+      Thread.sleep(3000);
+      piano.playNotesFromChord("CMajor", "dm", 100, 3000);
+      guitar.playChord("CMajor", "dm", 100, 3000);
+      Thread.sleep(3000);
+      piano.playNotesFromChord("CMajor", "am", 100, 3000);
+      guitar.playChord("CMajor", "am", 100, 3000);
+      
     }
     catch (Exception e) {
       e.printStackTrace();
     }
   }
 }
-
