@@ -3,6 +3,9 @@
 //import javax.sound.midi.Synthesizer;
 import javax.sound.midi.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MusicApp {
 	
 	public static MidiChannel[] channels;
@@ -22,7 +25,7 @@ public class MusicApp {
 		
 		//Instantiate necessary music creating objects and variables
 		int velocity = 100; 					// between 0 and 127
-		int duration = 1000; 				// in milliseconds
+		int duration = 3000; 				// in milliseconds
 		
 		try {
 			Synthesizer synth = MidiSystem.getSynthesizer();
@@ -61,6 +64,11 @@ public class MusicApp {
 				channels[7].programChange(guitarPatch.getBank(), guitarPatch.getProgram());
 				//Percussion is on channel[9] automatically
 				
+				/*Create Generic Players for Piano and Guitar*/
+				GenericPlayer piano = new GenericPlayer(channels, new int[]{0,1,2,3});
+			    GenericPlayer guitar = new GenericPlayer(channels, new int[]{4,5,6,7});
+			    GenericPlayer hihat = new GenericPlayer(channels, new int[]{9});
+				
 				/*Main Program Loop*/
 //				while (true) {
 //					//updateGrids();			//We want latest grid implementation. Do this with Brandon
@@ -69,15 +77,37 @@ public class MusicApp {
 
 				
 				/*Test Block*/
-				GenericPlayer p1 = new GenericPlayer(channels, new int[]{0,1,2,3});
-			    GenericPlayer g1 = new GenericPlayer(channels, new int[]{4,5,6,7});
-			    
-			    System.out.println("About to play a chord");
-			    
-			    p1.playChord("CMajor", "C", velocity, duration);
-			    //g1.playChord("CMajor", "em", velocity, duration);
-			    
-			    System.out.println("Played the chords");
+			    piano.playNotesFromChord("CMajor", "C", velocity, duration);
+			    guitar.playChord("CMajor", "C", velocity, duration);
+			    hihat.playNotesFromChord("HiHat", "COCO", velocity, duration);
+			    Thread.sleep(duration);
+			    piano.playNotesFromChord("CMajor", "em", velocity, duration);
+			    guitar.playChord("CMajor", "em", velocity, duration);
+			    hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
+			    Thread.sleep(duration);
+			    piano.playNotesFromChord("CMajor", "dm", velocity, duration);
+			    guitar.playChord("CMajor", "dm", velocity, duration);
+			    hihat.playNotesFromChord("HiHat", "CCOO", velocity, duration);
+			    Thread.sleep(duration);
+			    piano.playNotesFromChord("CMajor", "F", velocity, duration);
+			    guitar.playChord("CMajor", "F", velocity, duration);
+			    hihat.playNotesFromChord("HiHat", "OOOO", velocity, duration);
+			    Thread.sleep(duration);
+			    piano.playNotesFromChord("CMajor", "C", velocity, duration);
+			    guitar.playChord("CMajor", "C", velocity, duration);
+			    hihat.playNotesFromChord("HiHat", "OOCC", velocity, duration);
+			    Thread.sleep(duration);
+			    piano.playNotesFromChord("CMajor", "em", velocity, duration);
+			    guitar.playChord("CMajor", "em", velocity, duration);
+			    hihat.playNotesFromChord("HiHat", "CCCC", velocity, duration);
+			    Thread.sleep(duration);
+			    piano.playNotesFromChord("CMajor", "dm", velocity, duration);
+			    guitar.playChord("CMajor", "dm", velocity, duration);
+			    hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
+			    Thread.sleep(duration);
+			    piano.playNotesFromChord("CMajor", "am", velocity, duration);
+			    guitar.playChord("CMajor", "am", velocity, duration);
+			    hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
 				
 				/*End of Test Block*/
 				
@@ -116,7 +146,6 @@ public class MusicApp {
 				counter++;
 			}
 		}
-		
 		if (counter == 0 || counter == 4 || counter == 8) {
 			key = "CMajor";
 		}
@@ -130,6 +159,117 @@ public class MusicApp {
 			key = "FMajor";
 		}
 		return key;
+	}
+	
+	public static void getPianoNotes(String key) {
+		//Subsequent columns determine chords within the major scale
+		
+	}
+	
+	public static void getGuitarNotes(String key) {
+		//Key controlled by piano, only tempo varies on guitar
+	}
+	
+	public static String mapCellsToNote(int cellCount, String key) {
+		String chord = null;
+		
+		switch (key) {
+		case "CMajor":
+			if (cellCount == 0 || cellCount == 3 || cellCount == 8) {
+				chord = "C";
+			}
+			else if (cellCount == 1) {
+				chord = "dm";
+			}
+			else if (cellCount == 2 || cellCount == 4) {
+				chord = "em";
+			}
+			else if (cellCount == 5) {
+				chord = "F";
+			}
+			else if (cellCount == 6 || cellCount == 11) {
+				chord = "G";
+			}
+			else if (cellCount == 10) {
+				chord = "am";
+			}
+			else if (cellCount == 7 || cellCount == 9) {
+				chord = "B";
+			}
+			break;
+		case "GMajor":
+			if (cellCount == 0 || cellCount == 3 || cellCount == 8) {
+				chord = "G";
+			}
+			else if (cellCount == 1) {
+				chord = "am";
+			}
+			else if (cellCount == 2 || cellCount == 4) {
+				chord = "bm";
+			}
+			else if (cellCount == 5) {
+				chord = "C";
+			}
+			else if (cellCount == 6 || cellCount == 11) {
+				chord = "D";
+			}
+			else if (cellCount == 10) {
+				chord = "em";
+			}
+			else if (cellCount == 7 || cellCount == 9) {
+				chord = "Fsharp";
+			}
+			break;
+		case "DMajor":
+			if (cellCount == 0 || cellCount == 3 || cellCount == 8) {
+				chord = "D";
+			}
+			else if (cellCount == 1) {
+				chord = "em";
+			}
+			else if (cellCount == 2 || cellCount == 4) {
+				chord = "Fsharpm";
+			}
+			else if (cellCount == 5) {
+				chord = "G";
+			}
+			else if (cellCount == 6 || cellCount == 11) {
+				chord = "A";
+			}
+			else if (cellCount == 10) {
+				chord = "bm";
+			}
+			else if (cellCount == 7 || cellCount == 9) {
+				chord = "Csharp";
+			}
+			break;
+		case "FMajor":
+			if (cellCount == 0 || cellCount == 3 || cellCount == 8) {
+				chord = "F";
+			}
+			else if (cellCount == 1) {
+				chord = "gm";
+			}
+			else if (cellCount == 2 || cellCount == 4) {
+				chord = "am";
+			}
+			else if (cellCount == 5) {
+				chord = "Bflat";
+			}
+			else if (cellCount == 6 || cellCount == 11) {
+				chord = "C";
+			}
+			else if (cellCount == 10) {
+				chord = "dm";
+			}
+			else if (cellCount == 7 || cellCount == 9) {
+				chord = "E";
+			}
+			break;
+		default:
+			break;
+		}
+		return chord;
 	}
 		
 	
