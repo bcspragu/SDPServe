@@ -1,11 +1,8 @@
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit; import java.util.concurrent.TimeoutException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
@@ -14,37 +11,29 @@ import javax.sound.midi.Synthesizer;
 import javax.sound.midi.MidiChannel;
 
 public class GenericPlayer {
+  private MidiChannel[] channels;
   public Map<String, Map<String, int[]>> chords = new HashMap<String, Map<String, int[]>>();
 	public int[] useableChannels;
 
-  ExecutorService executor = Executors.newFixedThreadPool(10);
-
-  private class NotePlayer implements Callable<Void> {
-    private MidiChannel[] channels;
-    private Synthesizer synth;
+  private class NotePlayer extends Thread {
     private int[] notes;
     private int velocity;
     private long duration;
 
     public NotePlayer(int[] notes, int velocity, int duration) {
-      try {
-        synth = MidiSystem.getSynthesizer();
-        synth.open();
-        channels = synth.getChannels();
-
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
+      super("ThreadName" + notes);
       this.notes = notes;
       this.velocity = velocity;
       this.duration = (long) duration;
     }
 
     @Override
-    public Void call() throws Exception {
-      playChord();
-      synth.close();
-      return null;
+    public void run() {
+      try {
+        playChord();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
 
     private void playChord() throws InterruptedException {
@@ -63,7 +52,8 @@ public class GenericPlayer {
 
   }
 
-  public GenericPlayer(int[] useableChannels) {
+  public GenericPlayer(MidiChannel[] channels, int[] useableChannels) {
+    this.channels = channels;
     this.useableChannels = useableChannels;
     //
     // Initialize our sub-hashes
@@ -112,13 +102,7 @@ public class GenericPlayer {
 
   public void playChord(String scale, String chord, int velocity, int duration) throws Exception{
     int[] notes = chords.get(scale).get(chord);
-    NotePlayer player = new NotePlayer(notes, velocity, duration);
-    FutureTask<Void> futureTask = new FutureTask<Void>(player);
-    executor.execute(futureTask);
-  }
-
-  public void turnOff() {
-    executor.shutdown();
+    new NotePlayer(notes, velocity, duration).start();
   }
 
 }
