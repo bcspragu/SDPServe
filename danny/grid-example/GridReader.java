@@ -20,7 +20,7 @@ public class GridReader {
     return sb.toString();
   }
 
-  public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
+  private static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
     InputStream is = new URL(url).openStream();
     try {
       BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
@@ -32,8 +32,16 @@ public class GridReader {
     }
   }
 
+  public static Grids getCurrentState() {
+    new Grids(readJsonFromUrl("http://bsprague.com/grids.json"));
+  }
+
+  
+
+  /*
   public static void main(String[] args) throws IOException, JSONException {
     JSONObject json = readJsonFromUrl("http://localhost:8080/grids.json");
     System.out.println(json.toString());
   }
+  */
 }
