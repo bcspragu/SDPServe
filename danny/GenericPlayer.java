@@ -50,7 +50,7 @@ public class GenericPlayer {
 
   }
 
-  public Instrument(MidiChannel[] channels, int[] useableChannels) {
+  public GenericPlayer(MidiChannel[] channels, int[] useableChannels) {
     this.channels = channels;
     this.useableChannels = useableChannels;
     //
