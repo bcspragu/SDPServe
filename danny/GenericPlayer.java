@@ -1,108 +1,136 @@
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+//import javax.sound.midi.MidiChannel;
+//import javax.sound.midi.MidiSystem;
+//import javax.sound.midi.Synthesizer;
+import javax.sound.midi.*;
 
-import javax.sound.midi.MidiChannel;
+public class MusicApp {
+	
+	public static MidiChannel[] channels;
+	
+	public static int columnHeight = 12;
+	public static int rowLength = 12;
+	
+	//Declare arrays for instrument grids
+	public static boolean[][] percussion1 = new boolean[rowLength][columnHeight];
+	public static boolean[][] percussion2 = new boolean[rowLength][columnHeight];
+	public static boolean[][] piano = new boolean[rowLength][columnHeight];
+	public static boolean[][] guitar = new boolean[rowLength][columnHeight];
 
-public class GenericPlayer {
-  public Map<String, Map<String, int[]>> chords = new HashMap<String, Map<String, int[]>>();
-	public MidiChannel[] channels;
-	public int[] useableChannels;
+	public static void main( String[] args ) throws MidiUnavailableException, InvalidMidiDataException {
+		
+		//Instantiate necessary music creating objects and variables
+		int velocity = 100; 					// between 0 and 127
+		int duration = 1000; 				// in milliseconds
+		
+		try {
+			Synthesizer synth = MidiSystem.getSynthesizer();
+			synth.open();
+			channels = synth.getChannels();
+			Soundbank sbank = synth.getDefaultSoundbank();
+			synth.loadAllInstruments(sbank);
+			
+			Instrument inst[] = synth.getLoadedInstruments();		//Acquire an array of all instruments in this sound bank
+			
+			/*Instrument Setup*/
+			Instrument pianoInst = inst[0];			//Piano 1
+			Instrument guitarInst = inst[28];		//Clean Gt.
+//			Instrument bongo = null;			//Haven't decided on instrument yet
+//			Instrument cymbal = null;			//Haven't decided on instrument yet
+			boolean isSetupSuccess = false;
+			isSetupSuccess = setInstruments(pianoInst, guitarInst);
+			
+			if (!isSetupSuccess) {
+				System.out.println("Instrument setup failed!");	//This represents an instrument setup failure
+				System.exit(0);
+			}
+			else {
+				Patch pianoPatch = pianoInst.getPatch();				//Retrieves sound bank and program number
+				Patch guitarPatch = guitarInst.getPatch();
+				
+				/*Four Channels for Piano Notes*/
+				channels[0].programChange(pianoPatch.getBank(), pianoPatch.getProgram());
+				channels[1].programChange(pianoPatch.getBank(), pianoPatch.getProgram());
+				channels[2].programChange(pianoPatch.getBank(), pianoPatch.getProgram());
+				channels[3].programChange(pianoPatch.getBank(), pianoPatch.getProgram());
+				/*Four Channels for Guitar Notes*/
+				channels[4].programChange(guitarPatch.getBank(), guitarPatch.getProgram());
+				channels[5].programChange(guitarPatch.getBank(), guitarPatch.getProgram());
+				channels[6].programChange(guitarPatch.getBank(), guitarPatch.getProgram());
+				channels[7].programChange(guitarPatch.getBank(), guitarPatch.getProgram());
+				//Percussion is on channel[9] automatically
+				
+				/*Main Program Loop*/
+//				while (true) {
+//					//updateGrids();			//We want latest grid implementation. Do this with Brandon
+//				}
+				/*End of Main Program Loop*/
 
-  // Only need one background thread
-  ExecutorService executor = Executors.newFixedThreadPool(1);
+				
+				/*Test Block*/
+				GenericPlayer p1 = new GenericPlayer(channels, new int[]{0,1,2,3});
+			    GenericPlayer g1 = new GenericPlayer(channels, new int[]{4,5,6,7});
+			    
+			    System.out.println("About to play a chord");
+			    
+			    p1.playChord("CMajor", "C", velocity, duration);
+			    //g1.playChord("CMajor", "em", velocity, duration);
+			    
+			    System.out.println("Played the chords");
+				
+				/*End of Test Block*/
+				
+				synth.close();
+			}
+			
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
+	public static boolean updateGrids() {
+		//fill in later, for loops to update each value
+		return true;
+	}
 
-  private class NotePlayer implements Callable<Void> {
-    private int[] notes;
-    private int velocity;
-    private long duration;
+	public static void printInstruments(Instrument inst[]) {
+		for (int i = 0; i < inst.length; i++) {
+			System.out.println(inst[i].getName());
+		}
+	}
 
-    public NotePlayer(int[] notes, int velocity, int duration) {
-      this.notes = notes;
-      this.velocity = velocity;
-      this.duration = (long) duration;
-    }
-
-    @Override
-    public Void call() throws Exception {
-      playChord();
-      return null;
-    }
-
-    private void playChord() throws InterruptedException {
-      int index = 0;
-      for (int channel : useableChannels) {
-        channels[channel].noteOn(notes[index], velocity);
-        index++;
-      }
-      index = 0;
-      for (int channel : useableChannels) {
-        channels[channel].noteOff(notes[index]);
-        index++;
-      }
-    }
-
-  }
-
-  public GenericPlayer(MidiChannel[] channels, int[] useableChannels) {
-    this.channels = channels;
-    this.useableChannels = useableChannels;
-    //
-    // Initialize our sub-hashes
-    chords.put("CMajor", new HashMap<String, int[]>());
-    chords.put("DMajor", new HashMap<String, int[]>());
-    chords.put("FMajor", new HashMap<String, int[]>());
-    chords.put("GMajor", new HashMap<String, int[]>());
-
-    // Chords in C Major
-    chords.get("CMajor").put("C", new int[]{48,60,64,67});
-    chords.get("CMajor").put("dm", new int[]{50,57,62,65});
-    chords.get("CMajor").put("em", new int[]{52,59,64,67});
-    chords.get("CMajor").put("F", new int[]{53,57,60,65});
-    chords.get("CMajor").put("G", new int[]{55,59,62,67});
-    chords.get("CMajor").put("am", new int[]{45,57,60,64});
-    chords.get("CMajor").put("B", new int[]{47,59,62,65});
-
-    // Chords in D Major
-    chords.get("DMajor").put("D", new int[]{50,57,62,66});
-    chords.get("DMajor").put("em", new int[]{52,59,64,67});
-    chords.get("DMajor").put("Fsharpm", new int[]{54,57,61,66});
-    chords.get("DMajor").put("G", new int[]{55,59,62,67});
-    chords.get("DMajor").put("A", new int[]{45,57,61,64});
-    chords.get("DMajor").put("bm", new int[]{47,59,62,66});
-    chords.get("DMajor").put("Csharp", new int[]{49,61,64,67});
-
-    // Chords in F Major
-    chords.get("FMajor").put("F", new int[]{53,57,60,65});
-    chords.get("FMajor").put("gm", new int[]{55,58,62,67});
-    chords.get("FMajor").put("am", new int[]{45,57,60,64});
-    chords.get("FMajor").put("Bflat", new int[]{46,58,62,65});
-    chords.get("FMajor").put("C", new int[]{48,60,64,67});
-    chords.get("FMajor").put("dm", new int[]{50,57,62,65});
-    chords.get("FMajor").put("E", new int[]{52,58,64,67});
-
-    // Chords in G Major
-    chords.get("GMajor").put("G", new int[]{55,59,62,67});
-    chords.get("GMajor").put("am", new int[]{45,57,60,64});
-    chords.get("GMajor").put("bm", new int[]{47,59,62,66});
-    chords.get("GMajor").put("C", new int[]{48,60,64,67});
-    chords.get("GMajor").put("D", new int[]{50,57,62,66});
-    chords.get("GMajor").put("em", new int[]{52,59,64,67});
-    chords.get("GMajor").put("Fsharp", new int[]{54,57,60,66});
-  }
-
-
-  public void playChord(String scale, String chord, int velocity, int duration) {
-    int[] notes = chords.get(scale).get(chord);
-    NotePlayer player = new NotePlayer(notes, velocity, duration);
-    FutureTask<Void> futureTask = new FutureTask<Void>(player);
-    executor.execute(futureTask);
-  }
-
+	public static boolean setInstruments(Instrument inst1, Instrument inst2) {
+		return inst1 != null && inst2 != null;
+	}
+	
+	public static String determineMajorKey() {
+		//First column of piano grid will determine Major scale of our grids
+		String key = null;
+		int counter = 0;
+		for (int i = 0; i < columnHeight; i++) {
+			if (piano[0][i]) {			//If this cell contains a true, increment our counter
+				counter++;
+			}
+		}
+		
+		if (counter == 0 || counter == 4 || counter == 8) {
+			key = "CMajor";
+		}
+		else if (counter == 1 || counter == 5 || counter == 9) {
+			key = "GMajor";
+		} 
+		else if (counter == 2 || counter == 6 || counter == 10) {
+			key = "DMajor";
+		}
+		else if (counter == 3 || counter == 7 || counter == 11) {
+			key = "FMajor";
+		}
+		return key;
+	}
+		
+	
 }
+
+
