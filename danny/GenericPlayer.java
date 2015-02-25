@@ -8,7 +8,6 @@ import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Synthesizer;
 
-import javax.sound.midi.MidiChannel;
 
 public class GenericPlayer {
   private MidiChannel[] channels;
@@ -76,6 +75,7 @@ public class GenericPlayer {
     chords.put("DMajor", new HashMap<String, int[]>());
     chords.put("FMajor", new HashMap<String, int[]>());
     chords.put("GMajor", new HashMap<String, int[]>());
+    chords.put("HiHat", new HashMap<String, int[]>());
 
     // Chords in C Major
     chords.get("CMajor").put("C", new int[]{48,60,64,67});
@@ -112,6 +112,14 @@ public class GenericPlayer {
     chords.get("GMajor").put("D", new int[]{50,57,62,66});
     chords.get("GMajor").put("em", new int[]{52,59,64,67});
     chords.get("GMajor").put("Fsharp", new int[]{54,57,60,66});
+    
+    // Percussion Sounds
+    chords.get("HiHat").put("CCCC", new int[]{42,42,42,42});		//Closed x4
+    chords.get("HiHat").put("OCOC", new int[]{46,42,46,42});		//Open Closed x2
+    chords.get("HiHat").put("COCO", new int[]{42,46,42,46});		//Closed Open x2
+    chords.get("HiHat").put("CCOO", new int[]{42,42,46,46});		//Closed x2 Open x2
+    chords.get("HiHat").put("OOCC", new int[]{46,46,42,42});		//Open x2 Closed x2
+    chords.get("HiHat").put("OOOO", new int[]{46,46,46,46});		//Open x4
   }
 
 
