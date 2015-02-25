@@ -80,31 +80,45 @@ public class MusicApp {
 			    piano.playNotesFromChord("CMajor", "C", velocity, duration);
 			    guitar.playChord("CMajor", "C", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "COCO", velocity, duration);
-			    Thread.sleep(duration);
+
+          Thread.sleep(duration);
+
 			    piano.playNotesFromChord("CMajor", "em", velocity, duration);
 			    guitar.playChord("CMajor", "em", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
-			    Thread.sleep(duration);
+
+          Thread.sleep(duration);
+
 			    piano.playNotesFromChord("CMajor", "dm", velocity, duration);
 			    guitar.playChord("CMajor", "dm", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "CCOO", velocity, duration);
-			    Thread.sleep(duration);
+
+          Thread.sleep(duration);
+
 			    piano.playNotesFromChord("CMajor", "F", velocity, duration);
 			    guitar.playChord("CMajor", "F", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "OOOO", velocity, duration);
-			    Thread.sleep(duration);
+
+          Thread.sleep(duration);
+
 			    piano.playNotesFromChord("CMajor", "C", velocity, duration);
 			    guitar.playChord("CMajor", "C", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "OOCC", velocity, duration);
-			    Thread.sleep(duration);
+
+          Thread.sleep(duration);
+
 			    piano.playNotesFromChord("CMajor", "em", velocity, duration);
 			    guitar.playChord("CMajor", "em", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "CCCC", velocity, duration);
-			    Thread.sleep(duration);
+
+          Thread.sleep(duration);
+
 			    piano.playNotesFromChord("CMajor", "dm", velocity, duration);
 			    guitar.playChord("CMajor", "dm", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
-			    Thread.sleep(duration);
+
+          Thread.sleep(duration);
+
 			    piano.playNotesFromChord("CMajor", "am", velocity, duration);
 			    guitar.playChord("CMajor", "am", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
