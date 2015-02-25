@@ -10,7 +10,7 @@ import java.util.concurrent.TimeoutException;
 
 import javax.sound.midi.MidiChannel;
 
-public class Instrument {
+public class GenericPlayer {
   public Map<String, Map<String, int[]>> chords = new HashMap<String, Map<String, int[]>>();
 	public MidiChannel[] channels;
 	public int[] useableChannels;
