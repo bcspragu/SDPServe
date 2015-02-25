@@ -19,18 +19,24 @@ public class GenericPlayer {
     private int[] notes;
     private int velocity;
     private long duration;
+    private boolean isChord;
 
-    public NotePlayer(int[] notes, int velocity, int duration) {
+    public NotePlayer(int[] notes, int velocity, int duration, boolean isChord) {
       super("ThreadName" + notes);
       this.notes = notes;
       this.velocity = velocity;
       this.duration = (long) duration;
+      this.isChord = isChord;
     }
 
     @Override
     public void run() {
       try {
-        playChord();
+        if (isChord) {
+          playChord();
+        } else {
+          playNotes();
+        }
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -47,6 +53,15 @@ public class GenericPlayer {
       for (int channel : useableChannels) {
         channels[channel].noteOff(notes[index]);
         index++;
+      }
+    }
+    
+    private void playNotes() throws InterruptedException {
+      long noteLength = duration/notes.length;
+      for (int note : notes) {
+        channels[useableChannels[0]].noteOn(note, velocity);
+        Thread.sleep(noteLength);
+        channels[useableChannels[0]].noteOff(note);
       }
     }
 
@@ -102,7 +117,16 @@ public class GenericPlayer {
 
   public void playChord(String scale, String chord, int velocity, int duration) throws Exception{
     int[] notes = chords.get(scale).get(chord);
-    new NotePlayer(notes, velocity, duration).start();
+    new NotePlayer(notes, velocity, duration, true).start();
+  }
+
+  public void playNotes(int[] notes, int velocity, int duration) throws Exception{
+    new NotePlayer(notes, velocity, duration, false).start();
+  }
+
+  public void playNotesFromChord(String scale, String chord, int velocity, int duration) throws Exception{
+    int[] notes = chords.get(scale).get(chord);
+    new NotePlayer(notes, velocity, duration, false).start();
   }
 
 }
