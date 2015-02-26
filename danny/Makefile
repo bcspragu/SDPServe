@@ -1,7 +1,7 @@
 all: build
 	
 build: 
-	javac -cp *:. GenericPlayer.java GridReader.java Grids.java MusicApp.java MusicPlayer.java
+	javac -cp *:. *.java
 
 run:
 	java -cp *:. MusicApp
