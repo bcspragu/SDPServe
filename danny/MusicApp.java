@@ -38,7 +38,7 @@ public class MusicApp {
 			
 			/*Instrument Setup*/
 			Instrument pianoInst = inst[0];			//Piano 1
-			Instrument guitarInst = inst[28];		//Clean Gt.
+			Instrument guitarInst = inst[27];		//Clean Gt.
 //			Instrument bongo = null;			//Haven't decided on instrument yet
 //			Instrument cymbal = null;			//Haven't decided on instrument yet
 			boolean isSetupSuccess = false;
@@ -80,45 +80,31 @@ public class MusicApp {
 			    piano.playNotesFromChord("CMajor", "C", velocity, duration);
 			    guitar.playChord("CMajor", "C", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "COCO", velocity, duration);
-
-          Thread.sleep(duration);
-
+			    Thread.sleep(duration);
 			    piano.playNotesFromChord("CMajor", "em", velocity, duration);
 			    guitar.playChord("CMajor", "em", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
-
-          Thread.sleep(duration);
-
+			    Thread.sleep(duration);
 			    piano.playNotesFromChord("CMajor", "dm", velocity, duration);
 			    guitar.playChord("CMajor", "dm", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "CCOO", velocity, duration);
-
-          Thread.sleep(duration);
-
+			    Thread.sleep(duration);
 			    piano.playNotesFromChord("CMajor", "F", velocity, duration);
 			    guitar.playChord("CMajor", "F", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "OOOO", velocity, duration);
-
-          Thread.sleep(duration);
-
+			    Thread.sleep(duration);
 			    piano.playNotesFromChord("CMajor", "C", velocity, duration);
 			    guitar.playChord("CMajor", "C", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "OOCC", velocity, duration);
-
-          Thread.sleep(duration);
-
+			    Thread.sleep(duration);
 			    piano.playNotesFromChord("CMajor", "em", velocity, duration);
 			    guitar.playChord("CMajor", "em", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "CCCC", velocity, duration);
-
-          Thread.sleep(duration);
-
+			    Thread.sleep(duration);
 			    piano.playNotesFromChord("CMajor", "dm", velocity, duration);
 			    guitar.playChord("CMajor", "dm", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
-
-          Thread.sleep(duration);
-
+			    Thread.sleep(duration);
 			    piano.playNotesFromChord("CMajor", "am", velocity, duration);
 			    guitar.playChord("CMajor", "am", velocity, duration);
 			    hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
@@ -177,11 +163,24 @@ public class MusicApp {
 	
 	public static void getPianoNotes(String key) {
 		//Subsequent columns determine chords within the major scale
+		int numTrueCells = 0;
+		for (int j = 1; j < columnHeight; j++) {
+			for (int i = 0; i < rowLength; i++) {
+				if (piano[i][j]) {
+					numTrueCells++;
+				}
+			}
+			//mapCellsToNote(numTrueCells, key);		//This returns the specific chord as a String within a specified key.
+			//Encapsulate chord within a Note, then add it to a Song/Track
+			numTrueCells = 0;
+		}
 		
+		//return a track containing piano notes
 	}
 	
 	public static void getGuitarNotes(String key) {
-		//Key controlled by piano, only tempo varies on guitar
+		//Key controlled by piano, only tempo and note duration varies on guitar. Guitar decomposes chords played on piano
+		
 	}
 	
 	public static String mapCellsToNote(int cellCount, String key) {
