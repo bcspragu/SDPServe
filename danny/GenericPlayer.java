@@ -29,9 +29,10 @@ public class GenericPlayer {
       this.isProg = false;
     }
     
-    public NotePlayer(Progression prog) {
+    public NotePlayer(Progression prog, int velocity) {
       super("ThreadName" + prog);
       this.progression = prog;
+      this.velocity = velocity;
       this.isProg = true;
     }
 
@@ -76,6 +77,7 @@ public class GenericPlayer {
         index = 0;
         for (int note : nGroup.getNotes()) {
           channels[useableChannels[index]].noteOff(note);
+          index++;
         }
       }
     }
@@ -86,8 +88,6 @@ public class GenericPlayer {
     this.chords = chords;
     this.channels = channels;
     this.useableChannels = useableChannels;
-    
-    
   }
 
 
@@ -97,7 +97,7 @@ public class GenericPlayer {
   }
 
   public void play(Progression progression, int velocity) throws Exception{
-    new NotePlayer(progression).start();
+    new NotePlayer(progression, velocity).start();
   }
 
   public void playNotesFromChord(String scale, String chord, int velocity, int duration) {
@@ -108,7 +108,7 @@ public class GenericPlayer {
       offset[i] = i;
     }
     prog.add(notes, offset);
-    new NotePlayer(prog).start();
+    new NotePlayer(prog, velocity).start();
   }
 
 }

@@ -84,36 +84,36 @@ public class MusicApp {
 				
 				/*Test Block*/
 			    piano.playNotesFromChord("CMajor", "C", velocity, duration);
-			    guitar.play("CMajor", "C", velocity, duration);
-			    hihat.playNotesFromChord("HiHat", "COCO", velocity, duration);
-			    Thread.sleep(duration);
-			    piano.playNotesFromChord("CMajor", "em", velocity, duration);
-			    guitar.play("CMajor", "em", velocity, duration);
-			    hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
-			    Thread.sleep(duration);
-			    piano.playNotesFromChord("CMajor", "dm", velocity, duration);
-			    guitar.play("CMajor", "dm", velocity, duration);
-			    hihat.playNotesFromChord("HiHat", "CCOO", velocity, duration);
-			    Thread.sleep(duration);
-			    piano.playNotesFromChord("CMajor", "F", velocity, duration);
-			    guitar.play("CMajor", "F", velocity, duration);
-			    hihat.playNotesFromChord("HiHat", "OOOO", velocity, duration);
-			    Thread.sleep(duration);
-			    piano.playNotesFromChord("CMajor", "C", velocity, duration);
-			    guitar.play("CMajor", "C", velocity, duration);
-			    hihat.playNotesFromChord("HiHat", "OOCC", velocity, duration);
-			    Thread.sleep(duration);
-			    piano.playNotesFromChord("CMajor", "em", velocity, duration);
-			    guitar.play("CMajor", "em", velocity, duration);
-			    hihat.playNotesFromChord("HiHat", "CCCC", velocity, duration);
-			    Thread.sleep(duration);
-			    piano.playNotesFromChord("CMajor", "dm", velocity, duration);
-			    guitar.play("CMajor", "dm", velocity, duration);
-			    hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
-			    Thread.sleep(duration);
-			    piano.playNotesFromChord("CMajor", "am", velocity, duration);
-			    guitar.play("CMajor", "am", velocity, duration);
-			    hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
+          guitar.play("CMajor", "C", velocity, duration);
+          hihat.playNotesFromChord("HiHat", "COCO", velocity, duration);
+          Thread.sleep(duration);
+          piano.playNotesFromChord("CMajor", "em", velocity, duration);
+          guitar.play("CMajor", "em", velocity, duration);
+          hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
+          Thread.sleep(duration);
+          piano.playNotesFromChord("CMajor", "dm", velocity, duration);
+          guitar.play("CMajor", "dm", velocity, duration);
+          hihat.playNotesFromChord("HiHat", "CCOO", velocity, duration);
+          Thread.sleep(duration);
+          piano.playNotesFromChord("CMajor", "F", velocity, duration);
+          guitar.play("CMajor", "F", velocity, duration);
+          hihat.playNotesFromChord("HiHat", "OOOO", velocity, duration);
+          Thread.sleep(duration);
+          piano.playNotesFromChord("CMajor", "C", velocity, duration);
+          guitar.play("CMajor", "C", velocity, duration);
+          hihat.playNotesFromChord("HiHat", "OOCC", velocity, duration);
+          Thread.sleep(duration);
+          piano.playNotesFromChord("CMajor", "em", velocity, duration);
+          guitar.play("CMajor", "em", velocity, duration);
+          hihat.playNotesFromChord("HiHat", "CCCC", velocity, duration);
+          Thread.sleep(duration);
+          piano.playNotesFromChord("CMajor", "dm", velocity, duration);
+          guitar.play("CMajor", "dm", velocity, duration);
+          hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
+          Thread.sleep(duration);
+          piano.playNotesFromChord("CMajor", "am", velocity, duration);
+          guitar.play("CMajor", "am", velocity, duration);
+          hihat.playNotesFromChord("HiHat", "OCOC", velocity, duration);
 				
 				/*End of Test Block*/
 				
