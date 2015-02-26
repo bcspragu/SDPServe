@@ -6,8 +6,8 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 public class GridReader {
 
@@ -20,28 +20,25 @@ public class GridReader {
     return sb.toString();
   }
 
-  private static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
+  public static JSONObject readJsonFromUrl(String url) throws IOException {
     InputStream is = new URL(url).openStream();
     try {
       BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
       String jsonText = readAll(rd);
-      JSONObject json = new JSONObject(jsonText);
-      return json;
+      Object obj = JSONValue.parse(jsonText);
+      return (JSONObject)obj;
     } finally {
       is.close();
     }
   }
 
   public static Grids getCurrentState() {
-    new Grids(readJsonFromUrl("http://bsprague.com/grids.json"));
+    try {
+      JSONObject data = readJsonFromUrl("http://bsprague.com/grids.json");
+      return new Grids(data);
+    } catch (IOException e) {
+      return new Grids(new JSONObject());
+    }
   }
 
-  
-
-  /*
-  public static void main(String[] args) throws IOException, JSONException {
-    JSONObject json = readJsonFromUrl("http://localhost:8080/grids.json");
-    System.out.println(json.toString());
-  }
-  */
 }
