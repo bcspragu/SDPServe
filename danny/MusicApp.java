@@ -14,14 +14,20 @@ public class MusicApp {
 	public static int rowLength = 12;
 	
 	//Declare arrays for instrument grids
-	public static boolean[][] percussion1 = new boolean[rowLength][columnHeight];
-	public static boolean[][] percussion2 = new boolean[rowLength][columnHeight];
-	public static boolean[][] piano = new boolean[rowLength][columnHeight];
-	public static boolean[][] guitar = new boolean[rowLength][columnHeight];
+	public static boolean[][] percussion1;
+	public static boolean[][] percussion2;
+	public static boolean[][] piano;
+	public static boolean[][] guitar;
 	
 	
 
 	public static void main( String[] args ) throws MidiUnavailableException, InvalidMidiDataException {
+    Grids gridStates = GridReader.getCurrentState();
+
+    percussion1 = gridStates.getGrid("Drums");
+    percussion2 = gridStates.getGrid("Flute");
+    piano = gridStates.getGrid("Piano");
+    guitar = gridStates.getGrid("Guitar");
 		
 		//Instantiate necessary music creating objects and variables
 		int velocity = 100; 					// between 0 and 127
