@@ -24,8 +24,8 @@ public class MusicApp {
 	public static void main( String[] args ) throws MidiUnavailableException, InvalidMidiDataException {
     Grids gridStates = GridReader.getCurrentState();
 
-    percussion1 = gridStates.getGrid("Drums");
-    percussion2 = gridStates.getGrid("Flute");
+    percussion1 = gridStates.getGrid("Drum1");
+    percussion2 = gridStates.getGrid("Drum2");
     piano = gridStates.getGrid("Piano");
     guitar = gridStates.getGrid("Guitar");
 		

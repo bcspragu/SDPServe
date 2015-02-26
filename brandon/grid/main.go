@@ -8,10 +8,10 @@ import (
 )
 
 var gridSignatures = []gridDef{
-	{10, 10, "Piano", "#2ecc71"},
-	{10, 10, "Drums", "#3498db"},
-	{10, 10, "Guitar", "#e74c3c"},
-	{10, 10, "Flute", "#d35400"},
+	{12, 12, "Piano", "#2ecc71"},
+	{12, 12, "Drums", "#3498db"},
+	{12, 12, "Guitar", "#e74c3c"},
+	{12, 12, "Flute", "#d35400"},
 }
 
 type gridDef struct {
