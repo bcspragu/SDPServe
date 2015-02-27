@@ -63,14 +63,23 @@ public class MidiMaps {
       
       // Initialize our sub-hashes
       pChords.put("HiHat", new HashMap<String, int[]>());
+      pChords.put("TomDrum", new HashMap<String, int[]>());
       
-      // Percussion Sounds
+      // HiHat Sounds
       pChords.get("HiHat").put("CCCC", new int[]{42,42,42,42});		//Closed x4
       pChords.get("HiHat").put("OCOC", new int[]{46,42,46,42});		//Open Closed x2
       pChords.get("HiHat").put("COCO", new int[]{42,46,42,46});		//Closed Open x2
       pChords.get("HiHat").put("CCOO", new int[]{42,42,46,46});		//Closed x2 Open x2
       pChords.get("HiHat").put("OOCC", new int[]{46,46,42,42});		//Open x2 Closed x2
       pChords.get("HiHat").put("OOOO", new int[]{46,46,46,46});		//Open x4
+      
+      // Tom Drum Sounds
+      pChords.get("TomDrum").put("CCCC", new int[]{60,60,60,60});	
+      pChords.get("TomDrum").put("OCOC", new int[]{50,50,50,50});  
+      pChords.get("TomDrum").put("COCO", new int[]{70,70,70,70});
+      pChords.get("TomDrum").put("CCOO", new int[]{40,60,60,40});	
+      pChords.get("TomDrum").put("OOCC", new int[]{50,60,50,60});  
+      pChords.get("TomDrum").put("OOOO", new int[]{70,40,70,40});
     }
 
     return pChords;
