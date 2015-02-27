@@ -75,7 +75,7 @@ public class MusicApp {
                 Progression[] progs;
                 
                 /*Main Program Loop*/
-//              while (true) {
+              while (true) {
                     gridStates = GridReader.getCurrentState();
                     percussionGrid1 = gridStates.getGrid("Drum1");
                     percussionGrid2 = gridStates.getGrid("Drum2");
@@ -91,10 +91,10 @@ public class MusicApp {
 //                	tomDrum.play(progs[3], velocity);
                 	Thread.sleep(duration);
                 
-//              }
+              }
                 /*End of Main Program Loop*/
   
-                synth.close();
+                //synth.close();
             }
             
         }
@@ -353,13 +353,18 @@ public class MusicApp {
         }
         
         /*Parse Guitar Grid*/
+        int numTruePianoCells = 0;									//Used to set chords for guitar
         for (int j = 0; j < columnHeight; j++) {
             for (int i = 0; i < rowLength; i++) {
                 if (grid2[i][j]) {
                     numTrueCellsInColumn++;							//Count number of true cells in column
                 }
+                if (grid1[i][j]) {
+                    numTruePianoCells++;							//Count number of true cells in column
+                }
             }
             noteLengthGuitar = mapCellsToNoteLength(numTrueCellsInColumn);	  //Picks a note length used in the progression
+            chord = mapCellsToNote(numTruePianoCells, key);					  //Pick same chord as piano
             
             switch (noteLengthGuitar) {
             case "chord":
@@ -374,6 +379,7 @@ public class MusicApp {
             	break;
             }
             numTrueCellsInColumn = 0;
+            numTruePianoCells = 0;
         }
         
         return tunedProg;
