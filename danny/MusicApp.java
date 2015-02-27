@@ -24,7 +24,7 @@ public class MusicApp {
     public static void main( String[] args ) throws MidiUnavailableException, InvalidMidiDataException {
         //Instantiate necessary music creating objects and variables
         int velocity = 100;                     // between 0 and 127
-        int duration = 3000;                // in milliseconds
+        int duration = 24000;                   // in milliseconds
         
         try {
             Synthesizer synth = MidiSystem.getSynthesizer();
@@ -73,30 +73,29 @@ public class MusicApp {
                 
                 /*Initialize GridReader*/
                 Grids gridStates;
+                Progression[] progs;
                 
                 /*Main Program Loop*/
 //              while (true) {
-                    // gridStates = GridReader.getCurrentState();
-                    // percussionGrid1 = gridStates.getGrid("Drum1");
-                    // percussionGrid2 = gridStates.getGrid("Drum2");
-                    // pianoGrid = gridStates.getGrid("Piano");
-                    // guitarGrid = gridStates.getGrid("Guitar");
+                    gridStates = GridReader.getCurrentState();
+                    percussionGrid1 = gridStates.getGrid("Drum1");
+                    percussionGrid2 = gridStates.getGrid("Drum2");
+                    pianoGrid = gridStates.getGrid("Piano");
+                    guitarGrid = gridStates.getGrid("Guitar");
                 
-                	//String key = determineMajorKey();
+                	String key = determineMajorKey();
+                	progs = getProgressions(key, duration);
                 	
+                	piano.play(progs[0], velocity);
+                	guitar.play(progs[1], velocity);
+                	Thread.sleep(duration);
+//                	guitar.play(progs[1], velocity);
+//                	hihat.play(progs[2], velocity);
+//                	tomDrum.play(progs[3], velocity);
                 
 //              }
                 /*End of Main Program Loop*/
-
-                
-                /*Test Block*/
-                Progression hatProg = new Progression(MidiMaps.percussionMap(), duration);
-                hatProg.add("HiHat", "CCCC", new int[]{0,1,2,3});
-                hatProg.add("HiHat", "COCO", new int[]{0,1,2,3});
-                
-                hihat.play(hatProg, velocity);
-                /*End of Test Block*/
-                
+  
                 synth.close();
             }
             
@@ -142,28 +141,20 @@ public class MusicApp {
         return key;
     }
     
-    public static void getPianoNotes(String key) {
+    public static Progression[] getProgressions(String key, int duration) {
+    	
+    	Progression[] band = new Progression[4];
+    	Progression[] tunedProgressions = new Progression[2];
+    	Progression[] percussionProgressions = new Progression[2];
+    	
+    	tunedProgressions = getTunedProgressions(pianoGrid, guitarGrid, key, duration);
+    	band[0] = tunedProgressions[0];			//Piano
+    	band[1] = tunedProgressions[1];			//Guitar
+//    	band[2] = percussionProgressions[0];	//Hi Hat
+//    	band[3] = percussionProgressions[1];	//Tom Drum
     	
     	
-        //Subsequent columns determine chords within the major scale
-        int numTrueCells = 0;
-        for (int j = 1; j < columnHeight; j++) {
-            for (int i = 0; i < rowLength; i++) {
-                if (pianoGrid[i][j]) {
-                    numTrueCells++;
-                }
-            }
-            //mapCellsToNote(numTrueCells, key);        //This returns the specific chord as a String within a specified key.
-            //Encapsulate chord within a Note, then add it to a Song/Track
-            numTrueCells = 0;
-        }
-        
-        //return a track containing piano notes
-    }
-    
-    public static void getGuitarNotes(String key) {
-        //Key controlled by piano, only tempo and note duration varies on guitar. Guitar decomposes chords played on piano
-        
+        return band;
     }
     
     public static String mapCellsToNote(int cellCount, String key) {
@@ -267,7 +258,125 @@ public class MusicApp {
         }
         return chord;
     }
-        
+      
+    public static String mapCellsToNoteLength(int cellCount) {
+    	String noteType = null;
+    	
+    	switch (cellCount) {
+    	case 0:
+    		noteType = "chord";
+    		break;
+    	case 1:
+    		noteType = "quarter";
+    		break;
+    	case 2:
+    		noteType = "half";
+    		break;
+    	case 3:
+    		noteType = "chord";
+    		break;
+    	case 4:
+    		noteType = "quarter";
+    		break;
+    	case 5:
+    		noteType = "half";
+    		break;
+    	case 6:
+    		noteType = "chord";
+    		break;
+    	case 7:
+    		noteType = "quarter";
+    		break;
+    	case 8:
+    		noteType = "half";
+    		break;
+    	case 9:
+    		noteType = "chord";
+    		break;
+    	case 10:
+    		noteType = "quarter";
+    		break;
+    	case 11:
+    		noteType = "half";
+    		break;
+    	default:
+    		noteType = "quarter";
+    		break;
+    	}
+    	
+    	return noteType;
+    }
     
+    public static Progression[] getTunedProgressions(boolean[][] grid1, boolean[][] grid2, String key, int duration) {
+    	
+    	int[] quarterNotes = {0,1,2,3};
+    	int[] halfNotes = {0,2};
+    	
+    	/*Make Progression*/
+    	Progression[] tunedProg = new Progression[2];
+    	tunedProg[0] =  new Progression(MidiMaps.tunedMap(), duration);		//Piano
+    	tunedProg[1] =  new Progression(MidiMaps.tunedMap(), duration);		//Guitar
+    	
+        int numTrueCellsInColumn = 0;
+        int numTrueCellsInRow = 0;
+        String chord = null;
+        String noteLengthPiano;
+        String noteLengthGuitar;
+        
+        /*Parse Piano Grid*/
+        for (int j = 0; j < columnHeight; j++) {
+            for (int i = 0; i < rowLength; i++) {
+                if (grid1[i][j]) {
+                    numTrueCellsInColumn++;							//Count number of true cells in column
+                    if (grid1[j][i]) {
+                    	numTrueCellsInRow++;						//Count number of true cells in row. Used to determine chord/half/quarter notes
+                    }
+                }
+            }
+            chord = mapCellsToNote(numTrueCellsInColumn, key);        //This returns the specific chord as a String within a specified key.
+            noteLengthPiano = mapCellsToNoteLength(numTrueCellsInRow);	  //Picks a note length used in the progression
+            
+            switch (noteLengthPiano) {
+            case "chord":
+            	tunedProg[0].add(key, chord);
+            	break;
+            case "quarter":
+            	tunedProg[0].add(key, chord, quarterNotes);
+            	break;
+            case "half":
+            	tunedProg[0].add(key, chord, halfNotes);
+            default:
+            	break;
+            }
+            numTrueCellsInColumn = 0;
+            numTrueCellsInRow = 0;
+        }
+        
+        /*Parse Guitar Grid*/
+        for (int j = 0; j < columnHeight; j++) {
+            for (int i = 0; i < rowLength; i++) {
+                if (grid2[i][j]) {
+                    numTrueCellsInColumn++;							//Count number of true cells in column
+                }
+            }
+            noteLengthGuitar = mapCellsToNoteLength(numTrueCellsInColumn);	  //Picks a note length used in the progression
+            
+            switch (noteLengthGuitar) {
+            case "chord":
+            	tunedProg[1].add(key, chord);
+            	break;
+            case "quarter":
+            	tunedProg[1].add(key, chord, quarterNotes);
+            	break;
+            case "half":
+            	tunedProg[1].add(key, chord, halfNotes);
+            default:
+            	break;
+            }
+            numTrueCellsInColumn = 0;
+        }
+        
+        return tunedProg;
+    }
 }
 
