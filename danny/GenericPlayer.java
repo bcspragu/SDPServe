@@ -68,7 +68,9 @@ public class GenericPlayer {
         int index = 0;
         for (int note : nGroup.getNotes()) {
           channels[useableChannels[index]].noteOn(note, velocity);
-          index++;
+          
+          if (useableChannels.length > 1)					//Check for single channel progressions
+        	  index++;
         }
 
         long hold = progression.noteLength()/nGroup.getDivider();
@@ -77,7 +79,8 @@ public class GenericPlayer {
         index = 0;
         for (int note : nGroup.getNotes()) {
           channels[useableChannels[index]].noteOff(note);
-          index++;
+          if (useableChannels.length > 1)					//Check for single channel progressions
+        	  index++;
         }
       }
     }
