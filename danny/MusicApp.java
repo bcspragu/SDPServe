@@ -24,7 +24,7 @@ public class MusicApp {
     public static void main( String[] args ) throws MidiUnavailableException, InvalidMidiDataException {
         //Instantiate necessary music creating objects and variables
         int velocity = 100;                     // between 0 and 127
-        int duration = 24000;                   // in milliseconds
+        int duration = 14000;                   // in milliseconds
         
         try {
             Synthesizer synth = MidiSystem.getSynthesizer();
@@ -60,15 +60,14 @@ public class MusicApp {
                 channels[5].programChange(guitarPatch.getBank(), guitarPatch.getProgram());
                 channels[6].programChange(guitarPatch.getBank(), guitarPatch.getProgram());
                 channels[7].programChange(guitarPatch.getBank(), guitarPatch.getProgram());
-                /*Two Channels for Hi Hats*/
+                /*One Channel for Tom Drum*/
                 channels[8].programChange(tomDrumPatch.getBank(), tomDrumPatch.getProgram());
                 
-                //One percussion is on channel[9] automatically
                 
                 /*Create Generic Players for Piano and Guitar*/
                 GenericPlayer piano = new GenericPlayer(MidiMaps.tunedMap(), channels, new int[]{0,1,2,3});
                 GenericPlayer guitar = new GenericPlayer(MidiMaps.tunedMap(), channels, new int[]{4,5,6,7});
-                GenericPlayer hihat = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{9});
+                GenericPlayer hihat = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{9});		//Many percussion instruments on channel[9] automatically
                 GenericPlayer tomDrum = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{8});
                 
                 /*Initialize GridReader*/
@@ -88,10 +87,9 @@ public class MusicApp {
                 	
                 	piano.play(progs[0], velocity);
                 	guitar.play(progs[1], velocity);
-                	Thread.sleep(duration);
-//                	guitar.play(progs[1], velocity);
-//                	hihat.play(progs[2], velocity);
+                	hihat.play(progs[2], velocity);
 //                	tomDrum.play(progs[3], velocity);
+                	Thread.sleep(duration);
                 
 //              }
                 /*End of Main Program Loop*/
@@ -145,13 +143,12 @@ public class MusicApp {
     	
     	Progression[] band = new Progression[4];
     	Progression[] tunedProgressions = new Progression[2];
-    	Progression[] percussionProgressions = new Progression[2];
     	
     	tunedProgressions = getTunedProgressions(pianoGrid, guitarGrid, key, duration);
-    	band[0] = tunedProgressions[0];			//Piano
-    	band[1] = tunedProgressions[1];			//Guitar
-//    	band[2] = percussionProgressions[0];	//Hi Hat
-//    	band[3] = percussionProgressions[1];	//Tom Drum
+    	band[0] = tunedProgressions[0];								//Piano
+    	band[1] = tunedProgressions[1];								//Guitar
+    	band[2] = getHiHatProgression(percussionGrid1, duration);	//Hi Hat
+//    	band[3] = percussionProgressions[1];						//Tom Drum
     	
     	
         return band;
@@ -299,6 +296,9 @@ public class MusicApp {
     	case 11:
     		noteType = "half";
     		break;
+    	case 12:
+    		noteType = "chord";
+    		break;
     	default:
     		noteType = "quarter";
     		break;
@@ -328,9 +328,9 @@ public class MusicApp {
             for (int i = 0; i < rowLength; i++) {
                 if (grid1[i][j]) {
                     numTrueCellsInColumn++;							//Count number of true cells in column
-                    if (grid1[j][i]) {
-                    	numTrueCellsInRow++;						//Count number of true cells in row. Used to determine chord/half/quarter notes
-                    }
+                }
+                if (grid1[j][i]) {
+                	numTrueCellsInRow++;							//Count number of true cells in row. Used to determine chord/half/quarter notes
                 }
             }
             chord = mapCellsToNote(numTrueCellsInColumn, key);        //This returns the specific chord as a String within a specified key.
@@ -377,6 +377,97 @@ public class MusicApp {
         }
         
         return tunedProg;
+    }
+    
+    public static Progression getHiHatProgression(boolean[][] grid, int duration) {
+    	Progression hiHat = new Progression(MidiMaps.percussionMap(), duration);
+    	
+    	int[] quarterNotes = {0,1,2,3};
+    	int[] halfNotes = {0,2};
+    	int numTrueCellsInColumn = 0;
+    	int numTrueCellsInRow = 0;
+    	String noteLengthHiHat;
+    	String rhythm;
+    	
+    	for (int j = 0; j < columnHeight; j++) {
+            for (int i = 0; i < rowLength; i++) {
+                if (grid[i][j]) {
+                    numTrueCellsInColumn++;							//Count number of true cells in column
+                }
+                if (grid[j][i]) {
+                	numTrueCellsInRow++;							//Count number of true cells in row. Used to determine chord/half/quarter notes
+                }
+            }
+            noteLengthHiHat = mapCellsToNoteLength(numTrueCellsInRow);	  //Picks a note length used in the progression
+            rhythm = mapCellsToHiHat(numTrueCellsInColumn);
+            
+            switch (noteLengthHiHat) {
+            case "chord":
+            	hiHat.add("HiHat", rhythm);
+            	break;
+            case "quarter":
+            	hiHat.add("HiHat", rhythm, quarterNotes);
+            	break;
+            case "half":
+            	hiHat.add("HiHat", rhythm, halfNotes);
+            default:
+            	break;
+            }
+            numTrueCellsInColumn = 0;
+            numTrueCellsInRow = 0;
+        }
+    	return hiHat;
+    }
+    
+    public static String mapCellsToHiHat(int cellCount) {
+    	String rhythm;
+    	
+    	switch (cellCount) {
+    	case 0:
+    		rhythm = "CCCC";
+    		break;
+    	case 1:
+    		rhythm = "OCOC";
+    		break;
+    	case 2:
+    		rhythm = "COCO";
+    		break;
+    	case 3:
+    		rhythm = "CCOO";
+    		break;
+    	case 4:
+    		rhythm = "OOCC";
+    		break;
+    	case 5:
+    		rhythm = "OOOO";
+    		break;
+    	case 6:
+    		rhythm = "CCCC";
+    		break;
+    	case 7:
+    		rhythm = "OCOC";
+    		break;
+    	case 8:
+    		rhythm = "COCO";
+    		break;
+    	case 9:
+    		rhythm = "CCOO";
+    		break;
+    	case 10:
+    		rhythm = "OOCC";
+    		break;
+    	case 11:
+    		rhythm = "OOOO";
+    		break;
+    	case 12:
+    		rhythm = "CCCC";
+    		break;
+    	default:
+    		rhythm = "COCO";
+    		break;
+    	}
+    	
+    	return rhythm;
     }
 }
 
