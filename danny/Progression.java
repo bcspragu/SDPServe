@@ -23,6 +23,18 @@ public class Progression {
     prog.add(new NoteGroup(notes, 1));
     len++;
   }
+  
+  // Adding a chord
+  public void add(String scale, String chord) {
+    if (chords == null) {
+      // You never specified chords, so we're just going to return because
+      // exceptions are gross to handle
+      return;
+    }
+    int[] notes = chords.get(scale).get(chord);
+    prog.add(new NoteGroup(notes, 1));
+    len++;
+  }
 
   // Adding notes of a chord to be played in succession
   public void add(int[] notes, int[] offsets) {
@@ -36,6 +48,7 @@ public class Progression {
     if (chords == null) {
       // You never specified chords, so we're just going to return because
       // exceptions are gross to handle
+      return;
     }
     int[] notes = chords.get(scale).get(chord);
     for (int offset : offsets) {
