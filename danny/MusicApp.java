@@ -36,7 +36,7 @@ public class MusicApp {
             
             /*Instrument Setup*/
             Instrument pianoInst = inst[0];         //Piano 1
-            Instrument guitarInst = inst[27];       //Clean Gt.
+            Instrument guitarInst = inst[192];      //Clean Gt is 27, 192 is Orchestra!
             Instrument tomDrumInst = inst[117];     //Tom Drum
             boolean isSetupSuccess = false;
             isSetupSuccess = checkInstruments(pianoInst, guitarInst, tomDrumInst);
@@ -88,9 +88,8 @@ public class MusicApp {
                 	piano.play(progs[0], velocity);
                 	guitar.play(progs[1], velocity);
                 	hihat.play(progs[2], velocity);
-//                	tomDrum.play(progs[3], velocity);
+                	tomDrum.play(progs[3], velocity);
                 	Thread.sleep(duration);
-                
               }
                 /*End of Main Program Loop*/
   
@@ -143,13 +142,11 @@ public class MusicApp {
     	
     	Progression[] band = new Progression[4];
     	Progression[] tunedProgressions = new Progression[2];
-    	
     	tunedProgressions = getTunedProgressions(pianoGrid, guitarGrid, key, duration);
     	band[0] = tunedProgressions[0];								//Piano
     	band[1] = tunedProgressions[1];								//Guitar
     	band[2] = getHiHatProgression(percussionGrid1, duration);	//Hi Hat
-//    	band[3] = percussionProgressions[1];						//Tom Drum
-    	
+    	band[3] = getTomProgression(percussionGrid2,duration);		//Tom Drum
     	
         return band;
     }
@@ -405,7 +402,7 @@ public class MusicApp {
                 }
             }
             noteLengthHiHat = mapCellsToNoteLength(numTrueCellsInRow);	  //Picks a note length used in the progression
-            rhythm = mapCellsToHiHat(numTrueCellsInColumn);
+            rhythm = mapCellsToPercussion(numTrueCellsInColumn);
             
             switch (noteLengthHiHat) {
             case "chord":
@@ -425,7 +422,7 @@ public class MusicApp {
     	return hiHat;
     }
     
-    public static String mapCellsToHiHat(int cellCount) {
+    public static String mapCellsToPercussion(int cellCount) {
     	String rhythm;
     	
     	switch (cellCount) {
@@ -474,6 +471,46 @@ public class MusicApp {
     	}
     	
     	return rhythm;
+    }
+      
+    public static Progression getTomProgression(boolean[][] grid, int duration) {
+    	Progression tom = new Progression(MidiMaps.percussionMap(), duration);
+    	
+    	int[] quarterNotes = {0,1,2,3};
+    	int[] halfNotes = {0,2};
+    	int numTrueCellsInColumn = 0;
+    	int numTrueCellsInRow = 0;
+    	String noteLengthTom;
+    	String rhythm;
+    	
+    	for (int j = 0; j < columnHeight; j++) {
+            for (int i = 0; i < rowLength; i++) {
+                if (grid[i][j]) {
+                    numTrueCellsInColumn++;							//Count number of true cells in column
+                }
+                if (grid[j][i]) {
+                	numTrueCellsInRow++;							//Count number of true cells in row. Used to determine chord/half/quarter notes
+                }
+            }
+            noteLengthTom = mapCellsToNoteLength(numTrueCellsInRow);	  //Picks a note length used in the progression
+            rhythm = mapCellsToPercussion(numTrueCellsInColumn);
+            
+            switch (noteLengthTom) {
+            case "chord":
+            	tom.add("TomDrum", rhythm);
+            	break;
+            case "quarter":
+            	tom.add("TomDrum", rhythm, quarterNotes);
+            	break;
+            case "half":
+            	tom.add("TomDrum", rhythm, halfNotes);
+            default:
+            	break;
+            }
+            numTrueCellsInColumn = 0;
+            numTrueCellsInRow = 0;
+        }
+    	return tom;
     }
 }
 
