@@ -36,7 +36,7 @@ public class MusicApp {
             
             /*Instrument Setup*/
             Instrument pianoInst = inst[0];         //Piano 1
-            Instrument guitarInst = inst[192];      //Clean Gt is 27, 192 is Orchestra!
+            Instrument guitarInst = inst[27];      //Clean Gt is 27, 192 is Orchestra!
             Instrument tomDrumInst = inst[117];     //Tom Drum
             boolean isSetupSuccess = false;
             isSetupSuccess = checkInstruments(pianoInst, guitarInst, tomDrumInst);
@@ -106,7 +106,7 @@ public class MusicApp {
 
     public static void printInstruments(Instrument inst[]) {
         for (int i = 0; i < inst.length; i++) {
-            System.out.println(inst[i].getName());
+            System.out.println(i + " " + inst[i].getName());
         }
     }
 
