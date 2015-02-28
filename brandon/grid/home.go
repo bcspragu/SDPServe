@@ -23,7 +23,7 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Host   string
 		Grids  string
-		Colors map[string]string
+		Colors map[string]State
 	}{
 		r.Host,
 		string(gridString),

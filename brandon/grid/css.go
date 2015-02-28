@@ -4,11 +4,16 @@ import (
 	"strings"
 )
 
-var cssGridColors map[string]string = make(map[string]string)
+var cssGridColors = make(map[string]State)
 
-func init() {
+type State struct {
+	On  string
+	Off string
+}
+
+func initCss() {
 	for _, sig := range gridSignatures {
-		cssGridColors[nameAsCssClass(sig.Name)] = sig.Color
+		cssGridColors[nameAsCssClass(sig.Name)] = State{sig.OnColor, sig.OffColor}
 	}
 }
 

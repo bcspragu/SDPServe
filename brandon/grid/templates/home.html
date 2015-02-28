@@ -13,11 +13,16 @@
   var startGrid = JSON.parse('{{ .Grids }}');
   // Host also comes from server
   var host = "{{ .Host }}";
+  "{{.Colors}}"
 </script>
 <style type="text/css">
-  {{ range $class, $color := .Colors }}
+  {{ range $class, $colors := .Colors }}
+    {{$class}} .cell {
+      background-color: {{ $colors.Off }};
+    }
+
     {{$class}} .cell.active {
-      background-color: {{ $color }};
+      background-color: {{ $colors.On }};
     }
   {{ end }}
 </style>
