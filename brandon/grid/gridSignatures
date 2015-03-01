@@ -1,6 +1,6 @@
 [
-	{"XSize": 12, "YSize": 12, "Name": "Piano",  "OnColor": "#2ecc71", "OffColor": "#61ffa4"},
-	{"XSize": 12, "YSize": 12, "Name": "Guitar", "OnColor": "#e74c3c", "OffColor": "#ff7f6f"},
-	{"XSize": 12, "YSize": 12, "Name": "Drum1",  "OnColor": "#3498db", "OffColor": "#67cbff"},
-	{"XSize": 12, "YSize": 12, "Name": "Drum2",  "OnColor": "#d35400", "OffColor": "#ff8733"}
+	{"XSize": 12, "YSize": 12, "Name": "Piano",  "OnColor": "#2ecc71", "OffColor": "#94ffd7"},
+	{"XSize": 12, "YSize": 12, "Name": "Guitar", "OnColor": "#e74c3c", "OffColor": "#ffb2a2"},
+	{"XSize": 12, "YSize": 12, "Name": "Drum1",  "OnColor": "#3498db", "OffColor": "#9afeff"},
+	{"XSize": 12, "YSize": 12, "Name": "Drum2",  "OnColor": "#d35400", "OffColor": "#ffba66"}
 ]
