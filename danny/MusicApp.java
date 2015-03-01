@@ -23,7 +23,8 @@ public class MusicApp {
 
     public static void main( String[] args ) throws MidiUnavailableException, InvalidMidiDataException {
         //Instantiate necessary music creating objects and variables
-        int velocity = 100;                     // between 0 and 127
+        int velocityTom = 100;                     // between 0 and 127
+        int velocity = 75;                     // between 0 and 127
         int duration = 14000;                   // in milliseconds
         
         try {
@@ -88,7 +89,7 @@ public class MusicApp {
                 	piano.play(progs[0], velocity);
                 	guitar.play(progs[1], velocity);
                 	hihat.play(progs[2], velocity);
-                	tomDrum.play(progs[3], velocity);
+                	tomDrum.play(progs[3], velocityTom);
                 	Thread.sleep(duration);
               }
                 /*End of Main Program Loop*/
