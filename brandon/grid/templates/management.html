@@ -8,12 +8,10 @@
 <script src="/js/jquery.ui.min.js"></script>
 <script src="/js/jquery.color.min.js"></script>
 <script type="text/javascript">
-  // TODO: Maybe make this loaded after page to simplify things? Maybe?
   // Starting grid from server
   var startGrid = JSON.parse('{{ .Grids }}');
   // Host also comes from server
   var host = "{{ .Host }}";
-  "{{.Colors}}"
 </script>
 <style type="text/css">
   {{ range $class, $colors := .Colors }}
@@ -26,10 +24,8 @@
     }
   {{ end }}
 </style>
-<script src="js/main.js"></script>
+<script src="js/management.js"></script>
 </head>
 <body>
-  <div class="main-grid grid"></div>
-  <div class="mini-grids"></div>
 </body>
 </html>

@@ -1,15 +1,24 @@
 package main
 
 import (
-	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
 )
 
-var index, _ = template.ParseFiles("templates/home.html")
+type Settings struct {
+	Instruments []Instrument
+}
 
-func serveHome(w http.ResponseWriter, r *http.Request) {
+type Instrument struct {
+	Index    int
+	Name     string
+	Velocity int
+}
+
+var manage, _ = template.ParseFiles("templates/management.html")
+
+func serveManagement(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.Error(w, "Not found", 404)
 		return
@@ -19,17 +28,9 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	gridString, _ := json.Marshal(grids)
 	data := struct {
-		Host   string
-		Grids  string
-		Colors map[string]State
-	}{
-		r.Host,
-		string(gridString),
-		cssGridColors,
-	}
-	err := index.Execute(w, data)
+	}{}
+	err := manage.Execute(w, data)
 	if err != nil {
 		log.Println("Error executing template:", err)
 	}

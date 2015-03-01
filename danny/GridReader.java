@@ -34,7 +34,7 @@ public class GridReader {
 
   public static Grids getCurrentState() {
     try {
-      JSONObject data = readJsonFromUrl("http://bsprague.com/grids.json");
+      JSONObject data = readJsonFromUrl("http://localhost:8080/grids.json");
       return new Grids(data);
     } catch (IOException e) {
       return new Grids(new JSONObject());
