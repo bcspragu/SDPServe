@@ -77,11 +77,11 @@ public class MusicApp {
                 
                 /*Main Program Loop*/
               while (true) {
-                    gridStates = GridReader.getCurrentState();
-                    percussionGrid1 = gridStates.getGrid("Drum1");
-                    percussionGrid2 = gridStates.getGrid("Drum2");
-                    pianoGrid = gridStates.getGrid("Piano");
-                    guitarGrid = gridStates.getGrid("Guitar");
+                  gridStates = GridReader.getCurrentState();
+                  percussionGrid1 = gridStates.getGrid("Drum1");
+                  percussionGrid2 = gridStates.getGrid("Drum2");
+                  pianoGrid = gridStates.getGrid("Piano");
+                  guitarGrid = gridStates.getGrid("Guitar");
                 
                 	String key = determineMajorKey();
                 	progs = getProgressions(key, duration);

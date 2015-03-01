@@ -59,7 +59,6 @@ jQuery.fn.extend({
   loadGrid: function (gridName, gridData) {
     // Selector should only have a single element
     var gridHolder = $(this[0]);
-
     // Store the name of the grid on the holder
     gridHolder.data("name", gridName);
     gridHolder.addClass(nameToClass(gridName));
@@ -115,6 +114,13 @@ jQuery.fn.extend({
   // Sets the size of the cells relative to the size of the given grid
   resizeCells: function () {
     var gridHolder = $(this[0]);
+    gridHolder.find('.label').remove();
+    var label = $('<div class="label"></div>');
+    label.text(gridHolder.data('name'));
+    gridHolder.append(label);
+    label.animate({opacity: 0}, 1000, function () {
+      $(this).remove();
+    });
 
     var width = gridHolder.width();
     var height = gridHolder.height();

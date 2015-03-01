@@ -38,6 +38,7 @@ func main() {
 	go h.run()
 
 	http.HandleFunc("/", serveHome)
+	http.HandleFunc("/management", serveManagement)
 	http.HandleFunc("/ws", serveWs)
 	http.HandleFunc("/grids.json", serveGrids)
 	http.HandleFunc("/preset", saveGrids)
