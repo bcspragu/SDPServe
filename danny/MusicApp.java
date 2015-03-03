@@ -82,6 +82,7 @@ public class MusicApp {
                   percussionGrid2 = gridStates.getGrid("Drum2");
                   pianoGrid = gridStates.getGrid("Piano");
                   guitarGrid = gridStates.getGrid("Guitar");
+
                 
                     String key = determineMajorKey();
                     progs = getProgressions(key, duration);
@@ -334,9 +335,9 @@ public class MusicApp {
             chord = mapCellsToNote(numTrueCellsInColumn, key);        //This returns the specific chord as a String within a specified key.
             noteLengthPiano = mapCellsToNoteLength(numTrueCellsInRow);    //Picks a note length used in the progression
 
-            if (numTrueCellsInColumn == 0) {
-                noteLengthPiano = "rest";                           //We want a rest here
-            }
+            // if (numTrueCellsInColumn == 0) {
+            //     noteLengthPiano = "rest";                           //We want a rest here
+            // }
             
             switch (noteLengthPiano) {
             case "chord":
@@ -348,9 +349,9 @@ public class MusicApp {
             case "half":
                 tunedProg[0].add(key, chord, halfNotes);
                 break;
-            case "rest":
-                tunedProg[0].add();
-                break;
+            // case "rest":
+            //     tunedProg[0].add();
+            //     break;
             default:
                 break;
             }
@@ -372,9 +373,9 @@ public class MusicApp {
             noteLengthGuitar = mapCellsToNoteLength(numTrueCellsInColumn);    //Picks a note length used in the progression
             chord = mapCellsToNote(numTruePianoCells, key);                   //Pick same chord as piano
 
-            if (numTrueCellsInColumn == 0) {
-                noteLengthGuitar = "rest";                           //We want a rest here
-            }
+            // if (numTrueCellsInColumn == 0) {
+            //     noteLengthGuitar = "rest";                           //We want a rest here
+            // }
             
             switch (noteLengthGuitar) {
             case "chord":
@@ -386,13 +387,14 @@ public class MusicApp {
             case "half":
                 tunedProg[1].add(key, chord, halfNotes);
                 break;
-            case "rest":
-                tunedProg[1].add();
-                break;
+            // case "rest":
+            //     tunedProg[1].add();
+            //     break;
             default:
                 break;
             }
             numTrueCellsInColumn = 0;
+            numTrueCellsInRow = 0;
             numTruePianoCells = 0;
         }
         
@@ -421,9 +423,9 @@ public class MusicApp {
             noteLengthHiHat = mapCellsToNoteLength(numTrueCellsInRow);    //Picks a note length used in the progression
             rhythm = mapCellsToPercussion(numTrueCellsInColumn);
 
-            if (numTrueCellsInColumn == 0) {
-                noteLengthHiHat = "rest";
-            }
+            // if (numTrueCellsInColumn == 0) {
+            //     noteLengthHiHat = "rest";
+            // }
             
             switch (noteLengthHiHat) {
             case "chord":
@@ -435,9 +437,9 @@ public class MusicApp {
             case "half":
                 hiHat.add("HiHat", rhythm, halfNotes);
                 break;
-            case "rest":
-                hiHat.add();
-                break;
+            // case "rest":
+            //     hiHat.add();
+            //     break;
             default:
                 break;
             }
@@ -520,9 +522,9 @@ public class MusicApp {
             noteLengthTom = mapCellsToNoteLength(numTrueCellsInRow);      //Picks a note length used in the progression
             rhythm = mapCellsToPercussion(numTrueCellsInColumn);
 
-            if (numTrueCellsInColumn == 0) {
-                noteLengthTom = "rest";
-            }
+            // if (numTrueCellsInColumn == 0) {
+            //     noteLengthTom = "rest";
+            // }
             
             switch (noteLengthTom) {
             case "chord":
@@ -534,9 +536,9 @@ public class MusicApp {
             case "half":
                 tom.add("TomDrum", rhythm, halfNotes);
                 break;
-            case "rest":
-                tom.add();
-                break;
+            // case "rest":
+            //     tom.add();
+            //     break;
             default:
                 break;
             }
