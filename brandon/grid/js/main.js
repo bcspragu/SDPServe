@@ -34,12 +34,11 @@ $(function () {
 
 
   $('.main-grid, .mini-grids').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', '.cell', function() {
-    var cell = $(this);
-    if (cell.hasClass('pulse')) {
-      cell.removeClass('animated pulse');
-    } else if (cell.hasClass('fadeOut')) {
-      cell.remove();
-    }
+      $(this).removeClass('animated pulse');
+  });
+
+  $('body').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', '.label', function() {
+      $(this).remove();
   });
 
   $('.main-grid').on('touchstart', function (evt) {
@@ -185,8 +184,7 @@ jQuery.fn.extend({
     // Our y location is our row's index in the grid
     var yLoc = cell.parents('.row').index();
 
-    var furthest = Math.max(xCount-xLoc, yCount-yLoc);
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 12; i++) {
       (function (i) {
         setTimeout(function () {
           for (var x = -i; x <= i; x++) {
