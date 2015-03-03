@@ -28,7 +28,12 @@ $(function () {
 
 
   $('.main-grid, .mini-grids').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', '.cell', function() {
-    $(this).removeClass('animated pulse');
+    var cell = $(this);
+    if (cell.hasClass('pulse')) {
+      cell.removeClass('animated pulse');
+    } else if (cell.hasClass('fadeOut')) {
+      cell.remove();
+    }
   });
 
   $('.main-grid').on('touchstart', function (evt) {
@@ -115,12 +120,10 @@ jQuery.fn.extend({
   resizeCells: function () {
     var gridHolder = $(this[0]);
     gridHolder.find('.label').remove();
-    var label = $('<div class="label"></div>');
+
+    var label = $('<div class="label animated-slow fadeOut"></div>');
     label.text(gridHolder.data('name'));
     gridHolder.append(label);
-    label.animate({opacity: 0}, 1000, function () {
-      $(this).remove();
-    });
 
     var width = gridHolder.width();
     var height = gridHolder.height();
@@ -156,6 +159,7 @@ jQuery.fn.extend({
     // Build the message from various DOM attributes
     var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name});
     // Send the message to the server via WebSockets
+    console.log("Sent at: " + Date.now());
     conn.send(message);
   },
   // Animates the cells around us when we're done
@@ -242,6 +246,7 @@ function initWebsockets() {
         console.log(evt);
       }
       conn.onmessage = function(evt) { // Message received. evt.data is something
+        console.log("Received at: " + Date.now());
         // Parse the JSON out of the data
         var data = JSON.parse(evt.data);
         // Select our grid by the name passed to us
