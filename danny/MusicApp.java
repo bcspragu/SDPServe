@@ -373,7 +373,7 @@ public class MusicApp {
             chord = mapCellsToNote(numTruePianoCells, key);                   //Pick same chord as piano
 
             if (numTrueCellsInColumn == 0) {
-                noteLengthPiano = "rest";                           //We want a rest here
+                noteLengthGuitar = "rest";                           //We want a rest here
             }
             
             switch (noteLengthGuitar) {
