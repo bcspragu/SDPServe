@@ -12,7 +12,14 @@ var fadeTime = 100;
 var miniMargin = 2;
 var mainMargin = 6;
 
+var id;
+
+var requestCount = 0;
+var requestTime = 0;
+var lastSent;
+
 $(function () {
+  id = makeID();
   mainGrid = $('.main-grid');
   miniGrids = $('.mini-grids');
 
@@ -157,9 +164,9 @@ jQuery.fn.extend({
     var name = cell.parents('.grid').data('name');
 
     // Build the message from various DOM attributes
-    var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name});
+    var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name, id: id});
     // Send the message to the server via WebSockets
-    console.log("Sent at: " + Date.now());
+    lastSent = Date.now();
     conn.send(message);
   },
   // Animates the cells around us when we're done
@@ -246,7 +253,11 @@ function initWebsockets() {
         console.log(evt);
       }
       conn.onmessage = function(evt) { // Message received. evt.data is something
-        console.log("Received at: " + Date.now());
+        if (evt.id == id) {
+          requestCount++;
+          requestTime += Date.now() - lastSent;
+          console.log("Running average: " + requestTime/requestCount);
+        }
         // Parse the JSON out of the data
         var data = JSON.parse(evt.data);
         // Select our grid by the name passed to us
@@ -305,4 +316,14 @@ function swapGrids(grid1, grid2) {
   grid2.html(html1);
 
   resizeGrids();
+}
+
+function makeID () {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for( var i=0; i < 5; i++ )
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
 }
