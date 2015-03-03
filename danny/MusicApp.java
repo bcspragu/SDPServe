@@ -124,7 +124,7 @@ public class MusicApp {
                 counter++;
             }
         }
-        if (counter == 0 || counter == 4 || counter == 8) {
+        if (counter == 0 || counter == 4 || counter == 8 || counter == 12) {
             key = "CMajor";
         }
         else if (counter == 1 || counter == 5 || counter == 9) {
