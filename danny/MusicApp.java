@@ -385,6 +385,7 @@ public class MusicApp {
                 break;
             case "half":
                 tunedProg[1].add(key, chord, halfNotes);
+                break;
             case "rest":
                 tunedProg[1].add();
                 break;
