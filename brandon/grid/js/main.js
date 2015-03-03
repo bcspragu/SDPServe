@@ -16,7 +16,6 @@ var id;
 
 var requestCount = 0;
 var requestTime = 0;
-var lastSent;
 
 $(function () {
   id = makeID();
@@ -164,9 +163,8 @@ jQuery.fn.extend({
     var name = cell.parents('.grid').data('name');
 
     // Build the message from various DOM attributes
-    var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name, id: id});
+    var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name, id: id, sent: Date.now()});
     // Send the message to the server via WebSockets
-    lastSent = Date.now();
     conn.send(message);
   },
   // Animates the cells around us when we're done
@@ -253,13 +251,14 @@ function initWebsockets() {
         console.log(evt);
       }
       conn.onmessage = function(evt) { // Message received. evt.data is something
-        if (evt.id == id) {
-          requestCount++;
-          requestTime += Date.now() - lastSent;
-          console.log("Running average: " + requestTime/requestCount);
-        }
         // Parse the JSON out of the data
         var data = JSON.parse(evt.data);
+
+        if (data.id == id) {
+          requestCount++;
+          requestTime += (Date.now() - data.sent);
+          console.log("Running average: " + requestTime/requestCount);
+        }
         // Select our grid by the name passed to us
         var grid = $(nameAsCssClass(data.name));
         // Use the other attributes to figure out which cell to set
