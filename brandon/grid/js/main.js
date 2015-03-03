@@ -12,7 +12,13 @@ var fadeTime = 100;
 var miniMargin = 2;
 var mainMargin = 6;
 
+var id;
+
+var requestCount = 0;
+var requestTime = 0;
+
 $(function () {
+  id = makeID();
   mainGrid = $('.main-grid');
   miniGrids = $('.mini-grids');
 
@@ -28,7 +34,12 @@ $(function () {
 
 
   $('.main-grid, .mini-grids').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', '.cell', function() {
-    $(this).removeClass('animated pulse');
+    var cell = $(this);
+    if (cell.hasClass('pulse')) {
+      cell.removeClass('animated pulse');
+    } else if (cell.hasClass('fadeOut')) {
+      cell.remove();
+    }
   });
 
   $('.main-grid').on('touchstart', function (evt) {
@@ -115,12 +126,10 @@ jQuery.fn.extend({
   resizeCells: function () {
     var gridHolder = $(this[0]);
     gridHolder.find('.label').remove();
-    var label = $('<div class="label"></div>');
+
+    var label = $('<div class="label animated-slow fadeOut"></div>');
     label.text(gridHolder.data('name'));
     gridHolder.append(label);
-    label.animate({opacity: 0}, 1000, function () {
-      $(this).remove();
-    });
 
     var width = gridHolder.width();
     var height = gridHolder.height();
@@ -154,7 +163,7 @@ jQuery.fn.extend({
     var name = cell.parents('.grid').data('name');
 
     // Build the message from various DOM attributes
-    var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name});
+    var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name, id: id, sent: Date.now()});
     // Send the message to the server via WebSockets
     conn.send(message);
   },
@@ -244,6 +253,12 @@ function initWebsockets() {
       conn.onmessage = function(evt) { // Message received. evt.data is something
         // Parse the JSON out of the data
         var data = JSON.parse(evt.data);
+
+        if (data.id == id) {
+          requestCount++;
+          requestTime += (Date.now() - data.sent);
+          console.log("Running average: " + requestTime/requestCount);
+        }
         // Select our grid by the name passed to us
         var grid = $(nameAsCssClass(data.name));
         // Use the other attributes to figure out which cell to set
@@ -300,4 +315,14 @@ function swapGrids(grid1, grid2) {
   grid2.html(html1);
 
   resizeGrids();
+}
+
+function makeID () {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for( var i=0; i < 5; i++ )
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
 }
