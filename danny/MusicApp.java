@@ -334,6 +334,7 @@ public class MusicApp {
             }
             chord = mapCellsToNote(numTrueCellsInColumn, key);        //This returns the specific chord as a String within a specified key.
             noteLengthPiano = mapCellsToNoteLength(numTrueCellsInRow);    //Picks a note length used in the progression
+            System.out.println(numTrueCellsInRow);
 
             // if (numTrueCellsInColumn == 0) {
             //     noteLengthPiano = "rest";                           //We want a rest here
