@@ -57,6 +57,12 @@ public class Progression {
     len++;
   }
 
+  public void add() {
+    int[] notes = new int[]{};
+    prog.add(new NoteGroup(notes, 1));
+    len++;
+  }
+
   public List<NoteGroup> getProg() {
     return prog;
   }
