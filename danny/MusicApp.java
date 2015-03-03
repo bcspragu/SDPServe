@@ -173,7 +173,7 @@ public class MusicApp {
             else if (cellCount == 6 || cellCount == 11) {
                 chord = "G";
             }
-            else if (cellCount == 10) {
+            else if (cellCount == 10 || cellCount == 12) {
                 chord = "am";
             }
             else if (cellCount == 7 || cellCount == 9) {
@@ -196,7 +196,7 @@ public class MusicApp {
             else if (cellCount == 6 || cellCount == 11) {
                 chord = "D";
             }
-            else if (cellCount == 10) {
+            else if (cellCount == 10 || cellCount == 12) {
                 chord = "em";
             }
             else if (cellCount == 7 || cellCount == 9) {
@@ -219,7 +219,7 @@ public class MusicApp {
             else if (cellCount == 6 || cellCount == 11) {
                 chord = "A";
             }
-            else if (cellCount == 10) {
+            else if (cellCount == 10 || cellCount == 12) {
                 chord = "bm";
             }
             else if (cellCount == 7 || cellCount == 9) {
@@ -242,7 +242,7 @@ public class MusicApp {
             else if (cellCount == 6 || cellCount == 11) {
                 chord = "C";
             }
-            else if (cellCount == 10) {
+            else if (cellCount == 10 || cellCount == 12) {
                 chord = "dm";
             }
             else if (cellCount == 7 || cellCount == 9) {
