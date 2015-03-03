@@ -157,7 +157,7 @@ public class MusicApp {
         
         switch (key) {
         case "CMajor":
-            if (cellCount == 3 || cellCount == 8) {
+            if (cellCount == 0 || cellCount == 3 || cellCount == 8) {
                 chord = "C";
             }
             else if (cellCount == 1) {
