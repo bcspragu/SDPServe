@@ -338,6 +338,8 @@ public class MusicApp {
             if (numTrueCellsInColumn == 0) {
                 noteLengthPiano = "rest";                           //We want a rest here
             }
+
+            System.out.println(noteLengthPiano);
             
             switch (noteLengthPiano) {
             case "chord":
