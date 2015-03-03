@@ -347,6 +347,7 @@ public class MusicApp {
                 break;
             case "half":
                 tunedProg[0].add(key, chord, halfNotes);
+                break;
             case "rest":
                 tunedProg[0].add();
                 break;
@@ -432,6 +433,7 @@ public class MusicApp {
                 break;
             case "half":
                 hiHat.add("HiHat", rhythm, halfNotes);
+                break;
             case "rest":
                 hiHat.add();
                 break;
@@ -530,6 +532,7 @@ public class MusicApp {
                 break;
             case "half":
                 tom.add("TomDrum", rhythm, halfNotes);
+                break;
             case "rest":
                 tom.add();
                 break;
