@@ -28,7 +28,6 @@ $(function () {
 
   // When we click on the main grid, we want to update the grid locally and on the server
   $('.main-grid').on('click', '.cell', function () {
-    $(this).ripple();
     $(this).cellTrigger();
   });
 
@@ -108,11 +107,6 @@ jQuery.fn.extend({
                  .find('.row:eq(' + y + ')')
                  .find('.cell:eq(' + x + ')');
 
-   // Only start the ripple if we aren't already in that state
-   if ((cell.hasClass('active') && !on)
-       || (!cell.hasClass('active') && on)) {
-     cell.ripple();
-   }
    // Turn the cell on or off
    if (on) {
      cell.addClass('active', fadeTime);
@@ -120,6 +114,10 @@ jQuery.fn.extend({
      cell.removeClass('active', fadeTime);
    }
 
+   // Pulse
+   if (!cell.hasClass('pulse')) {
+    cell.addClass('animated pulse');
+   }
   },
   // Sets the size of the cells relative to the size of the given grid
   resizeCells: function () {
@@ -153,6 +151,7 @@ jQuery.fn.extend({
     var on = !cell.hasClass('active');
 
     cell.toggleClass('active', fadeTime);
+    cell.addClass('animated pulse');
 
     // Our x location is our index in the row
     var xLoc = cell.index();
@@ -165,45 +164,6 @@ jQuery.fn.extend({
     var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name, id: id, sent: Date.now()});
     // Send the message to the server via WebSockets
     conn.send(message);
-  },
-  // Animates the cells around us when we're done
-  ripple: function () {
-    var cell = $(this[0]);
-    var gridHolder = cell.parents('.grid');
-
-    // Start our pulse
-    cell.addClass('animated pulse');
-    
-    var yCount = gridHolder.find('.row').length
-    // The number of cells per row should be the same in a given grid, so we
-    // find the number of divs with the class cell in the first row we find
-    var xCount = gridHolder.find('.row:first > .cell').length
-
-    // Our x location is our index in the row
-    var xLoc = cell.index();
-    // Our y location is our row's index in the grid
-    var yLoc = cell.parents('.row').index();
-
-    for (var i = 0; i < 12; i++) {
-      (function (i) {
-        setTimeout(function () {
-          for (var x = -i; x <= i; x++) {
-            for (var y = -i; y <= i; y++) {
-              if ((x != 0 || y != 0)
-                  && (Math.abs(x) == i || Math.abs(y) == i)
-                  && xLoc+x >= 0
-                  && xLoc+x <= xCount
-                  && yLoc+y >= 0
-                  && yLoc+y <= yCount) {
-                var cell = gridHolder
-                             .find('.row:eq(' + (yLoc+y) + ')')
-                             .find('.cell:eq(' + (xLoc+x) + ')');
-                cell.addClass('animated pulse');
-              }
-            }
-          }
-      }, Math.pow(i,0.5)*100)})(i);
-    }
   }
 });
 
