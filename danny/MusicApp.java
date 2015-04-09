@@ -23,9 +23,10 @@ public class MusicApp {
 
     public static void main( String[] args ) throws MidiUnavailableException, InvalidMidiDataException {
         //Instantiate necessary music creating objects and variables
+        int velocityPiano = 100;                     // between 0 and 127
         int velocityTom = 100;                     // between 0 and 127
         int velocity = 75;                     // between 0 and 127
-        int duration = 14000;                   // in milliseconds
+        int duration = 8000;                   // in milliseconds
         
         try {
             Synthesizer synth = MidiSystem.getSynthesizer();
@@ -35,6 +36,7 @@ public class MusicApp {
             synth.loadAllInstruments(sbank);
             Instrument inst[] = synth.getLoadedInstruments();       //Acquire an array of all instruments in this sound bank
             
+            printInstruments(inst);
             /*Instrument Setup*/
             Instrument pianoInst = inst[0];         //Piano 1
             Instrument guitarInst = inst[27];      //Clean Gt is 27, 192 is Orchestra!
@@ -87,7 +89,7 @@ public class MusicApp {
                     String key = determineMajorKey();
                     progs = getProgressions(key, duration);
                     
-                    piano.play(progs[0], velocity);
+                    piano.play(progs[0], velocityPiano);
                     guitar.play(progs[1], velocity);
                     hihat.play(progs[2], velocity);
                     tomDrum.play(progs[3], velocityTom);
