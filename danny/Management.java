@@ -10,6 +10,7 @@ public class Management {
 
     Map<String, int> idNums = new HashMap<String, int>();
     Map<String, int> volumes = new HashMap<String, int>();
+    Map<String, int> isTuned = new HashMap<String, int>();
 
     public MgmtReader(JSONObject obj) {
         duration = obj.getInt("Duration");
@@ -30,6 +31,10 @@ public class Management {
         volumes.put("grid1", inst0.getInt("velocity"));
         volumes.put("grid2", inst1.getInt("velocity"));
         volumes.put("grid3", inst2.getInt("velocity"));
+        /*Tuning Info for Instruments*/
+        isTuned.put("grid1", inst0.getInt("tuned"));
+        isTuned.put("grid2", inst1.getInt("tuned"));
+        isTuned.put("grid3", inst2.getInt("tuned"));
     }
 
     public int getID(String grid) {
@@ -38,6 +43,10 @@ public class Management {
 
     public int getVolume(String grid) {
         return volumes.get(grid);
+    }
+
+    public int getTuned(String grid) {
+        return isTuned.get(grid);
     }
 
     public int getDuration() {
