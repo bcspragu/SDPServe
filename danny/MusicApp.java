@@ -123,22 +123,31 @@ public class MusicApp {
         String key = null;
         int counter = 0;
         for (int i = 0; i < columnHeight; i++) {
-            if (pianoGrid[0][i]) {          //If this cell contains a true, increment our counter
-                counter++;
-            }
+        	for (int j = 0; j < rowLength; j++) {
+        		if (pianoGrid[i][j]) {
+        			counter += i + j;
+        		}
+        	}
         }
-        if (counter == 0 || counter == 4 || counter == 8 || counter == 12) {
-            key = "CMajor";
+        
+        int keyModulus = counter % 4;	//4 Major Chords available
+        switch (keyModulus) {
+        case 0:
+        	key = "CMajor";
+        	break;
+        case 1:
+        	key = "GMajor";
+        	break;
+        case 2:
+        	key = "DMajor";
+        	break;
+        case 3:
+        	key = "FMajor";
+        	break;
+        default:
+        	break;
         }
-        else if (counter == 1 || counter == 5 || counter == 9) {
-            key = "GMajor";
-        } 
-        else if (counter == 2 || counter == 6 || counter == 10) {
-            key = "DMajor";
-        }
-        else if (counter == 3 || counter == 7 || counter == 11) {
-            key = "FMajor";
-        }
+
         return key;
     }
     
