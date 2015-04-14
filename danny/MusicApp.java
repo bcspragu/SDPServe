@@ -123,13 +123,6 @@ public class MusicApp {
         }
     }
 
-    public static void writeInstrumentsToFile(Instrument inst[]) {
-        PrintWriter writer = new PrintWriter("instruments.txt", "UTF-8");
-        for (int i = 0; i < inst.length; i++) {
-            // writer.println(inst[i].getName() + ",");
-        }
-    }
-
     public static boolean checkInstruments(Instrument inst1, Instrument inst2, Instrument inst3) {
         return inst1 != null && inst2 != null && inst3 != null;
     }
@@ -171,11 +164,11 @@ public class MusicApp {
         
         Progression[] band = new Progression[4];
         Progression[] tunedProgressions = new Progression[2];
-        tunedProgressions = getTunedProgressions(pianoGrid, guitarGrid, key, duration);
+        tunedProgressions = getTunedProgressions(grid1, grid2, key, duration);
         band[0] = tunedProgressions[0];                             
         band[1] = tunedProgressions[1];                             
-        band[2] = getHiHatProgression(percussionGrid1, duration);   
-        band[3] = getTomProgression(percussionGrid2,duration);      
+        band[2] = getHiHatProgression(grid3, duration);   
+        band[3] = getTomProgression(grid4,duration);      
         
         return band;
     }
@@ -374,8 +367,6 @@ public class MusicApp {
             if (numTrueCellsInColumn == 0) {
                 noteLengthPiano = "rest";                                       //We want a rest here
             }
-
-            System.out.println(noteLengthPiano);
             
             switch (noteLengthPiano) {
             case "chord":
@@ -403,13 +394,14 @@ public class MusicApp {
             for (int j = 0; j < columnHeight; j++) {
                 if (tuned2[i][j]) {
                     numTrueCellsInColumn++;                         //Count number of true cells in column
-                    
-                    if (firstCellIndex == -1) {                 //First cell we've seen
-                        firstCellIndex = j;
-                        lastCellIndex = j;
-                    } else {                                    //A new last cell has been found. Document it
-                        lastCellIndex = j;
-                    }
+                }
+                if (tuned1[i][j]) {     
+                        if (firstCellIndex == -1) {                 //First cell we've seen
+                            firstCellIndex = j;
+                            lastCellIndex = j;
+                        } else {                                    //A new last cell has been found. Document it
+                            lastCellIndex = j;
+                        }
                 }
             }
             int distance = lastCellIndex - firstCellIndex;                      //Calculate distance
