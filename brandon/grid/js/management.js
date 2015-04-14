@@ -1,4 +1,6 @@
 $(function () {
+  //$('select').selectpicker();
+
   $('.progress').click(function (e) {
     var bar = $(this).find('.progress-bar');
     var percentage = e.offsetX*100/bar.parent().width();

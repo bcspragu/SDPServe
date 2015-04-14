@@ -20,7 +20,7 @@ type GridDef struct {
 	Grid     Grid
 }
 
-func init() {
+func initGrids() {
 	w, err := os.Open("gridSignatures")
 	if err != nil {
 		log.Fatal("No grid file found")

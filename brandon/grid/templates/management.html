@@ -16,6 +16,16 @@
     </div>
     <div class="col-sm-4"><a class="snapshot btn btn-primary btn-block">Save Preset</a></div>
   </div>
+  <div class="row form-horizontal">
+    <div class="col-sm-4">
+      <select name="select">
+        {{ range $name, $preset := .Presets }}
+        <option value="{{ $name }}" data-info="{{ $preset.SettingsJSON }}" {{ if eq $name "Default" }} selected {{ end }}>{{ $name }}</option> 
+        {{ end }}
+      </select>
+    </div>
+  </div>
 </div>
+<script src="/js/bootstrap-select.js"></script>
 <script src="/js/management.js"></script>
 {{ template "footer" .}}

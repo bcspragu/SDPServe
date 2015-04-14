@@ -32,13 +32,13 @@ type Block struct {
 	Name string
 }
 
-var presets = make(map[string]map[string]Grid)
-
 func init() {
 	gob.Register(Instrument{})
+	gob.Register(Preset{})
+
+	initGrids()
 	initDB()
 	setHooks()
-	loadPresets()
 }
 
 func main() {
@@ -110,17 +110,6 @@ func setHooks() {
 	})
 }
 
-func loadPresets() {
-	files, _ := ioutil.ReadDir("presets")
-	for _, f := range files {
-		w, _ := os.Open("presets" + string(os.PathSeparator) + f.Name())
-		d := json.NewDecoder(w)
-		var g map[string]Grid
-		d.Decode(&g)
-		presets[f.Name()] = g
-	}
-}
-
 func initDB() {
 	var err error
 	db, err = bolt.Open("beat.db", 0600, nil)
@@ -130,13 +119,8 @@ func initDB() {
 	defer db.Close()
 
 	err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte("Presets"))
-		if err != nil {
-			return err
-		}
-
+		// Loading instruments to memory
 		inst := []byte("Instruments")
-
 		b := tx.Bucket(inst)
 		if b != nil {
 			// Means we can just load them to memory
@@ -147,6 +131,18 @@ func initDB() {
 			b, _ = tx.CreateBucket(inst)
 			err = instrumentsToDB(b)
 			log.Println("Made bucket and saved instruments to DB")
+		}
+
+		b, err := tx.CreateBucketIfNotExists([]byte("Presets"))
+		if err != nil {
+			return err
+		}
+
+		d := b.Get([]byte("Default"))
+		if d == nil {
+			// Create the Default Preset
+			def := DefaultPreset()
+			savePreset("Default", def, tx)
 		}
 
 		return err
@@ -173,6 +169,7 @@ func instrumentsToDB(b *bolt.Bucket) error {
 		s := strings.Split(line, ",")
 		inst := Instrument{ID: i, Name: s[0], Tuned: s[1] == "1"}
 		instruments[i] = inst
+		log.Println(inst)
 		err = enc.Encode(inst)
 		if err != nil {
 			return err
@@ -194,6 +191,10 @@ func instrumentsFromDB(b *bolt.Bucket) []Instrument {
 		buf := bytes.NewBuffer(v)
 		dec := gob.NewDecoder(buf)
 		err := dec.Decode(&inst)
+		if err != nil {
+			return err
+		}
+		log.Println(inst)
 		insts[i] = inst
 		i++
 		return err

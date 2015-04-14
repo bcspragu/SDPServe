@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"github.com/boltdb/bolt"
@@ -38,9 +40,11 @@ func serveManagement(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		BaseResponse
 		Settings
+		Presets map[string]Preset
 	}{
 		newResponse(r),
 		settings,
+		presets(),
 	}
 	err := templates.ExecuteTemplate(w, "management.html", data)
 	if err != nil {
@@ -72,15 +76,66 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 				settings.Duration = d
 			}
 		case "snapshot":
-			savePreset(val)
+			savePreset(val, Preset{settings, grids}, nil)
 		}
 	}
 }
 
-//TODO(bsprague): Finish implementing this
-func savePreset(name string) error {
-	return db.Update(func(tx *bolt.Tx) error {
-		tx.Bucket([]byte("Presets"))
+func presets() map[string]Preset {
+	presets := make(map[string]Preset)
+	db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("Presets"))
+		b.ForEach(func(k, v []byte) error {
+			buf := bytes.NewBuffer(v)
+			dec := gob.NewDecoder(buf)
+			preset := Preset{}
+			err := dec.Decode(&preset)
+			if err != nil {
+				return err
+			}
+			presets[string(k)] = preset
+			return nil
+		})
 		return nil
 	})
+	return presets
+}
+
+func savePreset(name string, preset Preset, t *bolt.Tx) error {
+	updateFunc := func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("Presets"))
+
+		var buf bytes.Buffer
+		enc := gob.NewEncoder(&buf)
+		err := enc.Encode(preset)
+		if err != nil {
+			return err
+		}
+
+		return b.Put([]byte(name), buf.Bytes())
+	}
+	// If tx isn't nil, we're already in the block
+	if t == nil {
+		return db.Update(func(tx *bolt.Tx) error {
+			return updateFunc(tx)
+		})
+	} else {
+		return updateFunc(t)
+	}
+}
+
+func (p Preset) SettingsJSON() (string, error) {
+	b, err := json.Marshal(p.Settings)
+	return string(b), err
+}
+
+func DefaultPreset() Preset {
+	preset := Preset{}
+	preset.Instruments = []ActiveInstrument{
+		{instruments[0], 100},
+		{instruments[24], 100},
+		{instruments[117], 100},
+	}
+	preset.Grids = grids
+	return preset
 }
