@@ -1,31 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>BeatBeam</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-<link type="text/css" rel="stylesheet" href="/css/main.css">
-<script src="/js/jquery.min.js"></script>
-<script src="/js/jquery.ui.min.js"></script>
-<script src="/js/jquery.color.min.js"></script>
-<script type="text/javascript">
-  // Starting grid from server
-  var startGrid = JSON.parse('{{ .Grids }}');
-  // Host also comes from server
-  var host = "{{ .Host }}";
-</script>
-<style type="text/css">
-  {{ range $class, $colors := .Colors }}
-    {{$class}} .cell {
-      background-color: {{ $colors.Off }};
-    }
-
-    {{$class}} .cell.active {
-      background-color: {{ $colors.On }};
-    }
-  {{ end }}
-</style>
-<script src="js/management.js"></script>
-</head>
-<body>
-</body>
-</html>
+{{ template "header" . }}
+<div class="container">
+  <h1>Management Console</h1>
+  <div class="row">
+    <div class="col-sm-1"><span class="icon icon-right glyphicon glyphicon-volume-down" aria-hidden="true"></span></div>
+    <div class="col-sm-10">
+      <div class="progress">
+        <div class="center progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: {{ .Duration }}%"></div>
+      </div>
+    </div>
+    <div class="col-sm-1"><span class="icon icon-left glyphicon glyphicon-volume-up" aria-hidden="true"></span></div>
+  </div>
+  <div class="row form-horizontal">
+    <div class="col-sm-4">
+      <input type="text" class="form-control preset-name" placeholder="Preset Name"/>
+    </div>
+    <div class="col-sm-4"><a class="snapshot btn btn-primary btn-block">Save Preset</a></div>
+  </div>
+</div>
+<script src="/js/management.js"></script>
+{{ template "footer" .}}

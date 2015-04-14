@@ -5,6 +5,33 @@ html, body{
     width: 100%;
     height: 100%;
     background: black;
+    font-family: 'Open Sans', sans-serif;
+}
+
+h1, h2, .icon {
+  color: white;
+}
+
+.icon {
+  font-size: 3em;
+}
+
+.icon-right {
+  float: right;
+}
+
+.icon-left {
+  float: left;
+}
+
+.center {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.progress {
+  margin-top: 12px;
 }
 
 .label {
@@ -105,8 +132,8 @@ html, body{
   }
 
   50% {
-    -webkit-transform: scale3d(1.1, 1.1, 1.1);
-            transform: scale3d(1.1, 1.1, 1.1);
+    -webkit-transform: scale3d(1.2, 1.2, 1.2);
+            transform: scale3d(1.2, 1.2, 1.2);
   }
 
   100% {
@@ -132,9 +159,48 @@ html, body{
   }
 }
 
+@-webkit-keyframes pulse-big {
+  0% {
+    -webkit-transform: scale3d(1, 1, 1);
+            transform: scale3d(1, 1, 1);
+  }
+
+  50% {
+    -webkit-transform: scale3d(1.4, 1.4, 1.4);
+            transform: scale3d(1.4, 1.4, 1.4);
+  }
+
+  100% {
+    -webkit-transform: scale3d(1, 1, 1);
+            transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes pulse-big {
+  0% {
+    -webkit-transform: scale3d(1, 1, 1);
+            transform: scale3d(1, 1, 1);
+  }
+
+  50% {
+    -webkit-transform: scale3d(1.4, 1.4, 1.4);
+            transform: scale3d(1.4, 1.4, 1.4);
+  }
+
+  100% {
+    -webkit-transform: scale3d(1, 1, 1);
+            transform: scale3d(1, 1, 1);
+  }
+}
+
 .pulse {
   -webkit-animation-name: pulse;
           animation-name: pulse;
+}
+
+.pulse-big {
+  -webkit-animation-name: pulse-big;
+          animation-name: pulse-big;
 }
 
 @-webkit-keyframes fadeOut {
@@ -151,3 +217,13 @@ html, body{
   -webkit-animation-name: fadeOut;
           animation-name: fadeOut;
 }
+
+{{ range $name, $grid := .Grids }}
+  {{ $grid.AsCSSClass }} .cell {
+    background-color: {{ $grid.OffColor }};
+  }
+
+  {{ $grid.AsCSSClass }} .cell.active {
+    background-color: {{ $grid.OnColor }};
+  }
+{{ end }}

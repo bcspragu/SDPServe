@@ -14,9 +14,6 @@ var mainMargin = 6;
 
 var id;
 
-var requestCount = 0;
-var requestTime = 0;
-
 $(function () {
   id = makeID();
   mainGrid = $('.main-grid');
@@ -116,7 +113,7 @@ jQuery.fn.extend({
 
    // Pulse
    if (!cell.hasClass('pulse')) {
-    cell.addClass('animated pulse');
+     cell.addClass('animated pulse');
    }
   },
   // Sets the size of the cells relative to the size of the given grid
@@ -161,7 +158,7 @@ jQuery.fn.extend({
     var name = cell.parents('.grid').data('name');
 
     // Build the message from various DOM attributes
-    var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name, id: id, sent: Date.now()});
+    var message = JSON.stringify({type: 'tap', on: on, x: xLoc, y: yLoc, name: name, id: id, sent: Date.now()});
     // Send the message to the server via WebSockets
     conn.send(message);
   }
@@ -187,12 +184,12 @@ function loadGrids(gridData) {
       // Fill the main grid first
       if (isMainGrid) {
         isMainGrid = false;
-        mainGrid.loadGrid(gridName, gridData[gridName]);
+        mainGrid.loadGrid(gridName, gridData[gridName].Grid);
       } else {
         var miniGrid = $('<div class="mini-grid grid"></div>');
         miniGrids.append(miniGrid);
         miniGrid.width(Math.ceil(miniGrids.width()/miniGridCount) - miniMargin);
-        miniGrid.loadGrid(gridName, gridData[gridName]);
+        miniGrid.loadGrid(gridName, gridData[gridName].Grid);
       }
     }
   }
@@ -212,10 +209,13 @@ function initWebsockets() {
         // Parse the JSON out of the data
         var data = JSON.parse(evt.data);
 
+        if (data.type != 'tap') {
+          return;
+        }
+        
         if (data.id == id) {
-          requestCount++;
-          requestTime += (Date.now() - data.sent);
-          console.log("Running average: " + requestTime/requestCount);
+          var requestTime = (Date.now() - data.sent);
+          $.post('/avg', {requestDuration: requestTime});
         }
         // Select our grid by the name passed to us
         var grid = $(nameAsCssClass(data.name));
