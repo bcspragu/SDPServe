@@ -60,7 +60,7 @@ public class MusicApp {
                     GenericPlayer gp4;
 
                     /*Determine Channels for Grid1. Need to know whether instrument is tuned from Management.*/
-                    if (mgmt.getTuned("grid1")) {
+                    if (mgmt.getTuned("grid1") == 1) {
                         //Tuned requires 4 channels
                         channels[0].programChange(gridPatch1.getBank(), gridPatch1.getProgram());
                         channels[1].programChange(gridPatch1.getBank(), gridPatch1.getProgram());
@@ -73,7 +73,7 @@ public class MusicApp {
                         gp1 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{0});
                     }
                     /*Determine Channels for Grid2. Need to know whether instrument is tuned from Management.*/
-                    if (mgmt.getTuned("grid2")) {
+                    if (mgmt.getTuned("grid2") == 1) {
                         //Tuned requires 4 channels
                         channels[4].programChange(gridPatch2.getBank(), gridPatch2.getProgram());
                         channels[5].programChange(gridPatch2.getBank(), gridPatch2.getProgram());
@@ -86,7 +86,7 @@ public class MusicApp {
                         gp2 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{4});
                     }
                     /*Determine Channels for Grid3. Need to know whether instrument is tuned from Management.*/
-                    if (mgmt.getTuned("grid3")) {
+                    if (mgmt.getTuned("grid3") == 1) {
                         //Tuned requires 4 channels
                         channels[8].programChange(gridPatch3.getBank(), gridPatch3.getProgram());
                         channels[10].programChange(gridPatch3.getBank(), gridPatch3.getProgram());

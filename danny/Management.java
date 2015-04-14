@@ -7,38 +7,38 @@ import org.json.simple.JSONArray;
 
 public class Management {
     int duration;
-    Map<String, Integer> idNums;
-    Map<String, Integer> volumes;
-    Map<String, Integer> isTuned;
+    static Map<String, Integer> idNums;
+    static Map<String, Integer> volumes;
+    static Map<String, Integer> isTuned;
 
     public Management(JSONObject obj) {
-        duration = obj.getInt("Duration");
+        duration = (int)(obj.get("Duration"));
         idNums = new HashMap<String, Integer>();
         volumes = new HashMap<String, Integer>();
         isTuned = new HashMap<String, Integer>();
 
-        jsonArrayToMaps((JSONArray)obj.get("Instruments"));
+        jsonArrayToMaps((JSONObject)obj.get("Instruments"));
     }
 
-    public static void jsonArrayToMaps(JSONArray mgmt) {
-        JSONArray inst0 = (JSONArray)mgmt.get(0);       //Grid1
-        JSONArray inst1 = (JSONArray)mgmt.get(1);       //Grid2
-        JSONArray inst2 = (JSONArray)mgmt.get(2);       //Grid3
-        JSONArray inst3 = (JSONArray)mgmt.get(3);       //Grid4
+    public static void jsonArrayToMaps(JSONObject mgmt) {
+        JSONObject inst0 = (JSONObject)(mgmt.get(0));       //Grid1
+        JSONObject inst1 = (JSONObject)(mgmt.get(1));       //Grid2
+        JSONObject inst2 = (JSONObject)(mgmt.get(2));       //Grid3
+        JSONObject inst3 = (JSONObject)(mgmt.get(3));       //Grid4
 
         /*ID Numbers for Instruments*/
-        idNums.put("grid1", (int)inst0.get("id"));
-        idNums.put("grid2", (int)inst1.get("id"));
-        idNums.put("grid3", (int)inst2.get("id"));
+        idNums.put("grid1", (int)(inst0.get("id")));
+        idNums.put("grid2", (int)(inst1.get("id")));
+        idNums.put("grid3", (int)(inst2.get("id")));
         /*Volumes for Instruments*/
-        volumes.put("grid1", (int)inst0.get("velocity"));
-        volumes.put("grid2", (int)inst1.get("velocity"));
-        volumes.put("grid3", (int)inst2.get("velocity"));
-        volumes.put("grid4", (int)inst3.get("velocity"));
+        volumes.put("grid1", (int)(inst0.get("velocity")));
+        volumes.put("grid2", (int)(inst1.get("velocity")));
+        volumes.put("grid3", (int)(inst2.get("velocity")));
+        volumes.put("grid4", (int)(inst3.get("velocity")));
         /*Tuning Info for Instruments*/
-        isTuned.put("grid1", (int)inst0.get("tuned"));
-        isTuned.put("grid2", (int)inst1.get("tuned"));
-        isTuned.put("grid3", (int)inst2.get("tuned"));
+        isTuned.put("grid1", (int)(inst0.get("tuned")));
+        isTuned.put("grid2", (int)(inst1.get("tuned")));
+        isTuned.put("grid3", (int)(inst2.get("tuned")));
     }
 
     public int getID(String grid) {
