@@ -19,6 +19,12 @@ var (
 	settings    = Settings{Duration: 100}
 	instruments []Instrument
 	db          *bolt.DB
+	mapping     = map[string]int{
+		"Red":    1,
+		"Orange": 2,
+		"Blue":   3,
+		"Green":  4,
+	}
 )
 
 type WSMessage struct {

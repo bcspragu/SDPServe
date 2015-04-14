@@ -14,8 +14,8 @@ public class MusicApp {
     public static boolean[][] grid4;
     
     public static void main( String[] args ) throws MidiUnavailableException, InvalidMidiDataException {
-        
         try {
+            Thread.sleep(5000);
             //Synth instantiation only required once
             Synthesizer synth = MidiSystem.getSynthesizer();
             synth.open();
