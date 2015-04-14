@@ -15,10 +15,9 @@ public class Management {
     public MgmtReader(JSONObject obj) {
         duration = obj.getInt("Duration");
         jsonArrayToMaps(obj.getJSONArray("Instruments"));
-
     }
 
-    private static jsonArrayToMaps(JSONArray mgmt) {
+    private static void jsonArrayToMaps(JSONArray mgmt) {
         JSONArray inst0 = (JSONArray)mgmt.get(0);       //Grid1
         JSONArray inst1 = (JSONArray)mgmt.get(1);       //Grid2
         JSONArray inst2 = (JSONArray)mgmt.get(2);       //Grid3
