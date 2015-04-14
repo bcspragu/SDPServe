@@ -27,18 +27,18 @@ public class Management {
         JSONObject inst3 = (JSONObject)(mgmt.get(3));       //Grid4
 
         /*ID Numbers for Instruments*/
-        idNums.put("grid1", (int)(inst0.get("id")));
-        idNums.put("grid2", (int)(inst1.get("id")));
-        idNums.put("grid3", (int)(inst2.get("id")));
+        idNums.put("Red", (int)(inst0.get("ID")));
+        idNums.put("Orange", (int)(inst1.get("ID")));
+        idNums.put("Blue", (int)(inst2.get("ID")));
         /*Volumes for Instruments*/
-        volumes.put("grid1", (int)(inst0.get("velocity")));
-        volumes.put("grid2", (int)(inst1.get("velocity")));
-        volumes.put("grid3", (int)(inst2.get("velocity")));
-        volumes.put("grid4", (int)(inst3.get("velocity")));
+        volumes.put("Red", (int)(inst0.get("Velocity")));
+        volumes.put("Orange", (int)(inst1.get("Velocity")));
+        volumes.put("Blue", (int)(inst2.get("Velocity")));
+        volumes.put("Green", (int)(inst3.get("Velocity")));
         /*Tuning Info for Instruments*/
-        isTuned.put("grid1", (int)(inst0.get("tuned")));
-        isTuned.put("grid2", (int)(inst1.get("tuned")));
-        isTuned.put("grid3", (int)(inst2.get("tuned")));
+        isTuned.put("Red", (int)(inst0.get("Tuned")));
+        isTuned.put("Orange", (int)(inst1.get("Tuned")));
+        isTuned.put("Blue", (int)(inst2.get("Tuned")));
     }
 
     public int getID(String grid) {
