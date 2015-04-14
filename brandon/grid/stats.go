@@ -42,7 +42,7 @@ func serveStats(w http.ResponseWriter, r *http.Request) {
 		BaseResponse
 		Stats
 	}{
-		newResponse(r),
+		newResponseBS(r),
 		stats,
 	}
 	err := templates.ExecuteTemplate(w, "stats.html", data)

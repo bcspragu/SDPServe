@@ -4,10 +4,18 @@
 <head>
 <title>BeatBeam</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-<link type="text/css" rel="stylesheet" href="/css/bootstrap.css">
-<link type="text/css" rel="stylesheet" href="/css/bootstrap-select.css">
-<link type="text/css" rel="stylesheet" href="/css/main.css">
-<link type="text/css" rel="stylesheet" href="/css/font.css">
+{{ template "css" . }}
+{{ template "scripts" . }}
+</head>
+<body>
+{{ end }}
+
+{{ define "footer" }}
+</body>
+</html>
+{{ end }}
+
+{{ define "scripts" }}
 <script src="/js/jquery.min.js"></script>
 <script src="/js/jquery.ui.min.js"></script>
 <script src="/js/jquery.color.min.js"></script>
@@ -19,11 +27,10 @@
   // Host also comes from server
   var host = "{{ .Host }}";
 </script>
-</head>
-<body>
 {{ end }}
 
-{{ define "footer" }}
-</body>
-</html>
+{{ define "css" }}
+  {{ range $i, $css := .CSS }}
+    <link type="text/css" rel="stylesheet" href="/css/{{ $css }}.css">
+  {{ end }}
 {{ end }}
