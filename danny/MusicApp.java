@@ -108,10 +108,10 @@ public class MusicApp {
                     progs = getProgressions(key, duration);
 
                     /*Play each progression*/
-                    gp1.play(progs[0], (int)((1.27)*mgmt.getVolume("Red"));
-                    gp2.play(progs[1], (int)((1.27)*mgmt.getVolume("Orange"));
-                    gp3.play(progs[2], (int)((1.27)*mgmt.getVolume("Blue"));
-                    gp4.play(progs[3], (int)((1.27)*mgmt.getVolume("Green"));
+                    gp1.play(progs[0], (int)((1.27)*mgmt.getVolume("Red")));
+                    gp2.play(progs[1], (int)((1.27)*mgmt.getVolume("Orange")));
+                    gp3.play(progs[2], (int)((1.27)*mgmt.getVolume("Blue")));
+                    gp4.play(progs[3], (int)((1.27)*mgmt.getVolume("Green")));
                     Thread.sleep(duration);
                 }
             }   
