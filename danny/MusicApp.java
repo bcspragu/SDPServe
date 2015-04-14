@@ -27,18 +27,18 @@ public class MusicApp {
             //printInstruments(inst);
             while (true) {
                 Grids gridStates = GridReader.getCurrentState();
-                grid1 = gridStates.getGrid("Drum1");          //Names may change
-                grid2 = gridStates.getGrid("Drum2");          //Names may change
-                grid3 = gridStates.getGrid("Piano");          //Names may change
-                grid4 = gridStates.getGrid("Guitar");         //Names may change
+                grid1 = gridStates.getGrid("Red");          //Names may change
+                grid2 = gridStates.getGrid("Orange");          //Names may change
+                grid3 = gridStates.getGrid("Blue");          //Names may change
+                grid4 = gridStates.getGrid("Green");         //Names may change
 
                 Instrument[] gridInstruments = new Instrument[3];       //Only 3 instruments b/c percussion is built into channel 9
                 Management mgmt = GridReader.getMgmt();                 //Acquire management info
 
                 /*Acquire IDs for each instrument*/
-                gridInstruments[0] = inst[mgmt.getID("grid1")];
-                gridInstruments[1] = inst[mgmt.getID("grid2")];
-                gridInstruments[2] = inst[mgmt.getID("grid3")];
+                gridInstruments[0] = inst[mgmt.getID("Red")];
+                gridInstruments[1] = inst[mgmt.getID("Orange")];
+                gridInstruments[2] = inst[mgmt.getID("Blue")];
                 /*Get global duration*/
                 int duration = mgmt.getDuration();
 
@@ -60,7 +60,7 @@ public class MusicApp {
                     GenericPlayer gp4;
 
                     /*Determine Channels for Grid1. Need to know whether instrument is tuned from Management.*/
-                    if (mgmt.getTuned("grid1") == 1) {
+                    if (mgmt.getTuned("Red") == 1) {
                         //Tuned requires 4 channels
                         channels[0].programChange(gridPatch1.getBank(), gridPatch1.getProgram());
                         channels[1].programChange(gridPatch1.getBank(), gridPatch1.getProgram());
@@ -73,7 +73,7 @@ public class MusicApp {
                         gp1 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{0});
                     }
                     /*Determine Channels for Grid2. Need to know whether instrument is tuned from Management.*/
-                    if (mgmt.getTuned("grid2") == 1) {
+                    if (mgmt.getTuned("Orange") == 1) {
                         //Tuned requires 4 channels
                         channels[4].programChange(gridPatch2.getBank(), gridPatch2.getProgram());
                         channels[5].programChange(gridPatch2.getBank(), gridPatch2.getProgram());
@@ -86,7 +86,7 @@ public class MusicApp {
                         gp2 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{4});
                     }
                     /*Determine Channels for Grid3. Need to know whether instrument is tuned from Management.*/
-                    if (mgmt.getTuned("grid3") == 1) {
+                    if (mgmt.getTuned("Blue") == 1) {
                         //Tuned requires 4 channels
                         channels[8].programChange(gridPatch3.getBank(), gridPatch3.getProgram());
                         channels[10].programChange(gridPatch3.getBank(), gridPatch3.getProgram());
@@ -107,10 +107,10 @@ public class MusicApp {
                     progs = getProgressions(key, duration);
 
                     /*Play each progression*/
-                    gp1.play(progs[0], mgmt.getVolume("grid1"));
-                    gp2.play(progs[1], mgmt.getVolume("grid2"));
-                    gp3.play(progs[2], mgmt.getVolume("grid3"));
-                    gp4.play(progs[3], mgmt.getVolume("grid4"));
+                    gp1.play(progs[0], mgmt.getVolume("Red"));
+                    gp2.play(progs[1], mgmt.getVolume("Orange"));
+                    gp3.play(progs[2], mgmt.getVolume("Blue"));
+                    gp4.play(progs[3], mgmt.getVolume("Green"));
                     Thread.sleep(duration);
                 }
             }   
