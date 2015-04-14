@@ -44,7 +44,7 @@ public class GridReader {
 
   public static Management getMgmt() {
     try {
-      JSONObject data = readJsonFromUrl("http://localhost:8080/mgmt.json");
+      JSONObject data = readJsonFromUrl("http://localhost:8080/management.json");
       //JSONObject data = readJsonFromUrl("http://192.168.2.1:8080/mgmt.json");
       return new Management(data);
     } catch (IOException e) {
