@@ -328,26 +328,35 @@ public class MusicApp {
         tunedProg[1] =  new Progression(MidiMaps.tunedMap(), duration);     //Guitar
         
         int numTrueCellsInColumn = 0;
-        int numTrueCellsInRow = 0;
+        int firstCellIndex = -1;
+        int lastCellIndex = -1;
+        
         String chord = null;
         String noteLengthPiano;
         String noteLengthGuitar;
         
         /*Parse Piano Grid*/
-        for (int j = 0; j < columnHeight; j++) {
-            for (int i = 0; i < rowLength; i++) {
+        for (int i = 0; i < rowLength; i++) {
+        	firstCellIndex = -1;
+            lastCellIndex = -1;
+            for (int j = 0; j < columnHeight; j++) {
                 if (grid1[i][j]) {
-                    numTrueCellsInRow++;                         //Count number of true cells in row
-                }
-                if (grid1[j][i]) {
-                    numTrueCellsInColumn++;                            //Count number of true cells in column. Used to determine chord/half/quarter notes
+                    numTrueCellsInColumn++;                      //Count number of true cells in column. Used to determine duration
+                    
+                    if (firstCellIndex == -1) {					//First cell we've seen
+                    	firstCellIndex = j;
+                    	lastCellIndex = j;
+                    } else {									//A new last cell has been found. Document it
+                    	lastCellIndex = j;
+                    }
                 }
             }
-            chord = mapCellsToNote(numTrueCellsInColumn, key);        //This returns the specific chord as a String within a specified key.
-            noteLengthPiano = mapCellsToNoteLength(numTrueCellsInRow);    //Picks a note length used in the progression
+            int distance = lastCellIndex - firstCellIndex;						//Calculate distance
+            chord = mapCellsToNote(distance, key);        						//This returns the specific chord as a String within a specified key.
+            noteLengthPiano = mapCellsToNoteLength(numTrueCellsInColumn);    	//Picks a note length used in the progression
 
             if (numTrueCellsInColumn == 0) {
-                noteLengthPiano = "rest";                           //We want a rest here
+                noteLengthPiano = "rest";                           			//We want a rest here
             }
 
             System.out.println(noteLengthPiano);
@@ -369,22 +378,28 @@ public class MusicApp {
                 break;
             }
             numTrueCellsInColumn = 0;
-            numTrueCellsInRow = 0;
         }
         
         /*Parse Guitar Grid*/
-        int numTruePianoCells = 0;                                  //Used to set chords for guitar
-        for (int j = 0; j < columnHeight; j++) {
-            for (int i = 0; i < rowLength; i++) {
-                if (grid2[j][i]) {
+        for (int i = 0; i < rowLength; i++) {
+        	firstCellIndex = -1;
+            lastCellIndex = -1;
+            for (int j = 0; j < columnHeight; j++) {
+                if (grid2[i][j]) {
                     numTrueCellsInColumn++;                         //Count number of true cells in column
-                }
-                if (grid1[i][j]) {
-                    numTruePianoCells++;                            //Count number of true cells in column
+                    
+                    if (firstCellIndex == -1) {					//First cell we've seen
+                    	firstCellIndex = j;
+                    	lastCellIndex = j;
+                    } else {									//A new last cell has been found. Document it
+                    	lastCellIndex = j;
+                    }
                 }
             }
+            int distance = lastCellIndex - firstCellIndex;						//Calculate distance
+            chord = mapCellsToNote(distance, key);                   		//Pick same chord as piano
             noteLengthGuitar = mapCellsToNoteLength(numTrueCellsInColumn);    //Picks a note length used in the progression
-            chord = mapCellsToNote(numTruePianoCells, key);                   //Pick same chord as piano
+            
 
             if (numTrueCellsInColumn == 0) {
                 noteLengthGuitar = "rest";                           //We want a rest here
@@ -407,8 +422,6 @@ public class MusicApp {
                 break;
             }
             numTrueCellsInColumn = 0;
-            numTrueCellsInRow = 0;
-            numTruePianoCells = 0;
         }
         
         return tunedProg;
