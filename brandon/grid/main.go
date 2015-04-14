@@ -191,8 +191,8 @@ func instrumentsToDB(b *bolt.Bucket) error {
 func instrumentsFromDB(b *bolt.Bucket) {
 	instruments = make([]Instrument, b.Stats().KeyN)
 	i := 0
-	var inst Instrument
 	b.ForEach(func(k, v []byte) error {
+		var inst Instrument
 		buf := bytes.NewBuffer(v)
 		dec := gob.NewDecoder(buf)
 		err := dec.Decode(&inst)

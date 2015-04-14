@@ -19,12 +19,25 @@ $(function () {
   $('.snapshot').click(function (e) {
     e.preventDefault();
     var name = $('.preset-name').val();
-    $.post('/settings', {snapshot: name});
+    $.post('/settings', {snapshot: name}, function() {
+      location.reload();
+    });
+  });
+
+  $('.load-preset').click(function (e) {
+    e.preventDefault();
+    var name = $('.preset-select').val();
+    $.post('/settings', {preset: name}, function() {
+      location.reload();
+    });
   });
 
   $('.change-instrument').click(function (e) {
-    var id = $(this).parents('.instrument').data('id');
-    var newID = $(this).parents('.instrument').find('.instrument-select').val();
-    $.post('/settings', {instrumentID: newID, id: id});
+    var inst = $(this).parents('.instrument');
+    var id = inst.data('id');
+    var newID = inst.find('.instrument-select').val();
+    $.post('/settings', {instrumentID: newID, id: id}, function(data) {
+      inst.find('.instrument-name').text(data.newName);
+    }, 'json');
   });
 });

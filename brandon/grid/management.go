@@ -92,8 +92,13 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 			for i, inst := range settings.Instruments {
 				if id == inst.ID {
 					settings.Instruments[i].Instrument = instruments[newID]
+					resp["newName"] = instruments[newID].Name
 				}
 			}
+		case "preset":
+			p := presets()[val]
+			settings = p.Settings
+			grids = p.Grids
 		}
 	}
 	w.WriteHeader(http.StatusOK)
