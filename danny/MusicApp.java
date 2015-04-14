@@ -40,7 +40,8 @@ public class MusicApp {
                 gridInstruments[1] = inst[mgmt.getID("Orange")];
                 gridInstruments[2] = inst[mgmt.getID("Blue")];
                 /*Get global duration*/
-                int duration = mgmt.getDuration();
+                int duration = (int)((100 - mgmt.getDuration()) * 120 + 4000);
+
 
                 //Setup three instruments according to data from Management console
                 boolean isSetupSuccess = checkInstruments(gridInstruments[0], gridInstruments[1], gridInstruments[2]);
@@ -107,10 +108,10 @@ public class MusicApp {
                     progs = getProgressions(key, duration);
 
                     /*Play each progression*/
-                    gp1.play(progs[0], mgmt.getVolume("Red"));
-                    gp2.play(progs[1], mgmt.getVolume("Orange"));
-                    gp3.play(progs[2], mgmt.getVolume("Blue"));
-                    gp4.play(progs[3], mgmt.getVolume("Green"));
+                    gp1.play(progs[0], (int)((1.27)*mgmt.getVolume("Red"));
+                    gp2.play(progs[1], (int)((1.27)*mgmt.getVolume("Orange"));
+                    gp3.play(progs[2], (int)((1.27)*mgmt.getVolume("Blue"));
+                    gp4.play(progs[3], (int)((1.27)*mgmt.getVolume("Green"));
                     Thread.sleep(duration);
                 }
             }   
