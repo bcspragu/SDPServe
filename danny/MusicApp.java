@@ -13,8 +13,6 @@ public class MusicApp {
     public static boolean[][] grid3;
     public static boolean[][] grid4;
     
-    
-
     public static void main( String[] args ) throws MidiUnavailableException, InvalidMidiDataException {
         
         try {
@@ -37,10 +35,11 @@ public class MusicApp {
                 Instrument[] gridInstruments = new Instrument[3];       //Only 3 instruments b/c percussion is built into channel 9
                 Management mgmt = GridReader.getMgmt();                 //Acquire management info
 
+                /*Acquire IDs for each instrument*/
                 gridInstruments[0] = mgmt.getID("grid1");
                 gridInstruments[1] = mgmt.getID("grid2");
                 gridInstruments[2] = mgmt.getID("grid3");
-
+                /*Get global duration*/
                 int duration = mgmt.getDuration();
 
                 //Setup three instruments according to data from Management console
@@ -54,46 +53,54 @@ public class MusicApp {
                     Patch gridPatch2 = gridInstruments[1].getPatch();
                     Patch gridPatch3 = gridInstruments[2].getPatch();
 
-                    int channelCount = 0;
-
                     /*Determine Channels for Grid1. Need to know whether instrument is tuned from Management.*/
                     if (mgmt.isTuned("grid1")) {
+                        //Tuned requires 4 channels
                         channels[0].programChange(gridInstruments[0].getBank(), gridInstruments[0].getProgram());
                         channels[1].programChange(gridInstruments[0].getBank(), gridInstruments[0].getProgram());
                         channels[2].programChange(gridInstruments[0].getBank(), gridInstruments[0].getProgram());
                         channels[3].programChange(gridInstruments[0].getBank(), gridInstruments[0].getProgram());
                         GenericPlayer gp1 = new GenericPlayer(MidiMaps.tunedMap(), channels, new int[]{0,1,2,3});
                     } else {
+                        //Untuned requires 1 channel
                         channels[0].programChange(gridInstruments[0].getBank(), gridInstruments[0].getProgram());
                         GenericPlayer gp1 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{0});
                     }
                     /*Determine Channels for Grid2. Need to know whether instrument is tuned from Management.*/
                     if (mgmt.isTuned("grid2")) {
+                        //Tuned requires 4 channels
                         channels[4].programChange(gridInstruments[1].getBank(), gridInstruments[1].getProgram());
                         channels[5].programChange(gridInstruments[1].getBank(), gridInstruments[1].getProgram());
                         channels[6].programChange(gridInstruments[1].getBank(), gridInstruments[1].getProgram());
                         channels[7].programChange(gridInstruments[1].getBank(), gridInstruments[1].getProgram());
                         GenericPlayer gp2 = new GenericPlayer(MidiMaps.tunedMap(), channels, new int[]{4,5,6,7});
                     } else {
+                        //Untuned requires 1 channel
                         channels[4].programChange(gridInstruments[1].getBank(), gridInstruments[1].getProgram());
                         GenericPlayer gp2 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{4});
                     }
                     /*Determine Channels for Grid3. Need to know whether instrument is tuned from Management.*/
                     if (mgmt.isTuned("grid3")) {
+                        //Tuned requires 4 channels
                         channels[8].programChange(gridInstruments[2].getBank(), gridInstruments[2].getProgram());
                         channels[10].programChange(gridInstruments[2].getBank(), gridInstruments[2].getProgram());
                         channels[11].programChange(gridInstruments[2].getBank(), gridInstruments[2].getProgram());
                         channels[12].programChange(gridInstruments[2].getBank(), gridInstruments[2].getProgram());
                         GenericPlayer gp3 = new GenericPlayer(MidiMaps.tunedMap(), channels, new int[]{8,10,11,12});
                     } else {
+                        //Untuned requires 1 channel
                         channels[8].programChange(gridInstruments[2].getBank(), gridInstruments[2].getProgram());
                         GenericPlayer gp3 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{8});
                     }
 
-                    GenericPlayer gp4 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{9});      //Many percussion instruments on channel[9] automatically
+                    //Many percussion instruments on channel[9] automatically
+                    GenericPlayer gp4 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{9});      
+                    
                     Progression[] progs;
                     String key = determineMajorKey();
                     progs = getProgressions(key, duration);
+
+                    /*Play each progression*/
                     gp1.play(progs[0], mgmt.getVolume("grid1"));
                     gp2.play(progs[1], mgmt.getVolume("grid2"));
                     gp3.play(progs[2], mgmt.getVolume("grid3"));
