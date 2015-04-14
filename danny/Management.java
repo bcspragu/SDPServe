@@ -7,12 +7,11 @@ import org.json.simple.JSONArray;
 
 public class Management {
     int duration;
-
     Map<String, int> idNums = new HashMap<String, int>();
     Map<String, int> volumes = new HashMap<String, int>();
     Map<String, int> isTuned = new HashMap<String, int>();
 
-    public MgmtReader(JSONObject obj) {
+    public Management(JSONObject obj) {
         duration = obj.getInt("Duration");
         jsonArrayToMaps(obj.getJSONArray("Instruments"));
     }
