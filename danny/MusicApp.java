@@ -1,10 +1,4 @@
-//import javax.sound.midi.MidiChannel;
-//import javax.sound.midi.MidiSystem;
-//import javax.sound.midi.Synthesizer;
 import javax.sound.midi.*;
-
-//import java.util.HashMap;
-//import java.util.Map;
 
 public class MusicApp {
     
@@ -14,21 +8,15 @@ public class MusicApp {
     public static int rowLength = 12;
     
     //Declare arrays for instrument grids
-    public static boolean[][] percussionGrid1;
-    public static boolean[][] percussionGrid2;
-    public static boolean[][] pianoGrid;
-    public static boolean[][] guitarGrid;
+    public static boolean[][] grid1;
+    public static boolean[][] grid2;
+    public static boolean[][] grid3;
+    public static boolean[][] grid4;
     
-    
-
     public static void main( String[] args ) throws MidiUnavailableException, InvalidMidiDataException {
-        //Instantiate necessary music creating objects and variables
-        int velocityPiano = 100;                     // between 0 and 127
-        int velocityTom = 100;                     // between 0 and 127
-        int velocity = 75;                     // between 0 and 127
-        int duration = 8000;                   // in milliseconds
         
         try {
+            //Synth instantiation only required once
             Synthesizer synth = MidiSystem.getSynthesizer();
             synth.open();
             channels = synth.getChannels();
@@ -36,70 +24,91 @@ public class MusicApp {
             synth.loadAllInstruments(sbank);
             Instrument inst[] = synth.getLoadedInstruments();       //Acquire an array of all instruments in this sound bank
             
-            printInstruments(inst);
-            /*Instrument Setup*/
-            Instrument pianoInst = inst[0];         //Piano 1
-            Instrument guitarInst = inst[27];      //Clean Gt is 27, 192 is Orchestra!
-            Instrument tomDrumInst = inst[117];     //Tom Drum
-            boolean isSetupSuccess = false;
-            isSetupSuccess = checkInstruments(pianoInst, guitarInst, tomDrumInst);
-            
-            if (!isSetupSuccess) {
+            //printInstruments(inst);
+            while (true) {
+                Grids gridStates = GridReader.getCurrentState();
+                grid1 = gridStates.getGrid("Drum1");          //Names may change
+                grid2 = gridStates.getGrid("Drum2");          //Names may change
+                grid3 = gridStates.getGrid("Piano");          //Names may change
+                grid4 = gridStates.getGrid("Guitar");         //Names may change
+
+                Instrument[] gridInstruments = new Instrument[3];       //Only 3 instruments b/c percussion is built into channel 9
+                Management mgmt = GridReader.getMgmt();                 //Acquire management info
+
+                /*Acquire IDs for each instrument*/
+                gridInstruments[0] = mgmt.getID("grid1");
+                gridInstruments[1] = mgmt.getID("grid2");
+                gridInstruments[2] = mgmt.getID("grid3");
+                /*Get global duration*/
+                int duration = mgmt.getDuration();
+
+                //Setup three instruments according to data from Management console
+                isSetupSuccess(gridInstruments[0], gridInstruments[1], gridInstruments[2]);
+                if (!isSetupSuccess) {
                 System.out.println("Instrument setup failed!"); //This represents an instrument setup failure
                 System.exit(0);
-            }
-            else {
-                Patch pianoPatch = pianoInst.getPatch();                //Retrieves sound bank and program number
-                Patch guitarPatch = guitarInst.getPatch();
-                Patch tomDrumPatch = tomDrumInst.getPatch();
-                
-                /*Four Channels for Piano Notes*/
-                channels[0].programChange(pianoPatch.getBank(), pianoPatch.getProgram());
-                channels[1].programChange(pianoPatch.getBank(), pianoPatch.getProgram());
-                channels[2].programChange(pianoPatch.getBank(), pianoPatch.getProgram());
-                channels[3].programChange(pianoPatch.getBank(), pianoPatch.getProgram());
-                /*Four Channels for Guitar Notes*/
-                channels[4].programChange(guitarPatch.getBank(), guitarPatch.getProgram());
-                channels[5].programChange(guitarPatch.getBank(), guitarPatch.getProgram());
-                channels[6].programChange(guitarPatch.getBank(), guitarPatch.getProgram());
-                channels[7].programChange(guitarPatch.getBank(), guitarPatch.getProgram());
-                /*One Channel for Tom Drum*/
-                channels[8].programChange(tomDrumPatch.getBank(), tomDrumPatch.getProgram());
-                
-                
-                /*Create Generic Players for Piano and Guitar*/
-                GenericPlayer piano = new GenericPlayer(MidiMaps.tunedMap(), channels, new int[]{0,1,2,3});
-                GenericPlayer guitar = new GenericPlayer(MidiMaps.tunedMap(), channels, new int[]{4,5,6,7});
-                GenericPlayer hihat = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{9});      //Many percussion instruments on channel[9] automatically
-                GenericPlayer tomDrum = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{8});
-                
-                /*Initialize GridReader*/
-                Grids gridStates;
-                Progression[] progs;
-                
-                /*Main Program Loop*/
-              while (true) {
-                  gridStates = GridReader.getCurrentState();
-                  percussionGrid1 = gridStates.getGrid("Drum1");
-                  percussionGrid2 = gridStates.getGrid("Drum2");
-                  pianoGrid = gridStates.getGrid("Piano");
-                  guitarGrid = gridStates.getGrid("Guitar");
+                }
+                else {
+                    Patch gridPatch1 = gridInstruments[0].getPatch();                //Retrieves sound bank and program number
+                    Patch gridPatch2 = gridInstruments[1].getPatch();
+                    Patch gridPatch3 = gridInstruments[2].getPatch();
 
-                
+                    /*Determine Channels for Grid1. Need to know whether instrument is tuned from Management.*/
+                    if (mgmt.isTuned("grid1")) {
+                        //Tuned requires 4 channels
+                        channels[0].programChange(gridInstruments[0].getBank(), gridInstruments[0].getProgram());
+                        channels[1].programChange(gridInstruments[0].getBank(), gridInstruments[0].getProgram());
+                        channels[2].programChange(gridInstruments[0].getBank(), gridInstruments[0].getProgram());
+                        channels[3].programChange(gridInstruments[0].getBank(), gridInstruments[0].getProgram());
+                        GenericPlayer gp1 = new GenericPlayer(MidiMaps.tunedMap(), channels, new int[]{0,1,2,3});
+                    } else {
+                        //Untuned requires 1 channel
+                        channels[0].programChange(gridInstruments[0].getBank(), gridInstruments[0].getProgram());
+                        GenericPlayer gp1 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{0});
+                    }
+                    /*Determine Channels for Grid2. Need to know whether instrument is tuned from Management.*/
+                    if (mgmt.isTuned("grid2")) {
+                        //Tuned requires 4 channels
+                        channels[4].programChange(gridInstruments[1].getBank(), gridInstruments[1].getProgram());
+                        channels[5].programChange(gridInstruments[1].getBank(), gridInstruments[1].getProgram());
+                        channels[6].programChange(gridInstruments[1].getBank(), gridInstruments[1].getProgram());
+                        channels[7].programChange(gridInstruments[1].getBank(), gridInstruments[1].getProgram());
+                        GenericPlayer gp2 = new GenericPlayer(MidiMaps.tunedMap(), channels, new int[]{4,5,6,7});
+                    } else {
+                        //Untuned requires 1 channel
+                        channels[4].programChange(gridInstruments[1].getBank(), gridInstruments[1].getProgram());
+                        GenericPlayer gp2 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{4});
+                    }
+                    /*Determine Channels for Grid3. Need to know whether instrument is tuned from Management.*/
+                    if (mgmt.isTuned("grid3")) {
+                        //Tuned requires 4 channels
+                        channels[8].programChange(gridInstruments[2].getBank(), gridInstruments[2].getProgram());
+                        channels[10].programChange(gridInstruments[2].getBank(), gridInstruments[2].getProgram());
+                        channels[11].programChange(gridInstruments[2].getBank(), gridInstruments[2].getProgram());
+                        channels[12].programChange(gridInstruments[2].getBank(), gridInstruments[2].getProgram());
+                        GenericPlayer gp3 = new GenericPlayer(MidiMaps.tunedMap(), channels, new int[]{8,10,11,12});
+                    } else {
+                        //Untuned requires 1 channel
+                        channels[8].programChange(gridInstruments[2].getBank(), gridInstruments[2].getProgram());
+                        GenericPlayer gp3 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{8});
+                    }
+
+                    //Many percussion instruments on channel[9] automatically
+                    GenericPlayer gp4 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{9});      
+                    
+                    Progression[] progs;
                     String key = determineMajorKey();
                     progs = getProgressions(key, duration);
-                    
-                    piano.play(progs[0], velocityPiano);
-                    guitar.play(progs[1], velocity);
-                    hihat.play(progs[2], velocity);
-                    tomDrum.play(progs[3], velocityTom);
+
+                    /*Play each progression*/
+                    gp1.play(progs[0], mgmt.getVolume("grid1"));
+                    gp2.play(progs[1], mgmt.getVolume("grid2"));
+                    gp3.play(progs[2], mgmt.getVolume("grid3"));
+                    gp4.play(progs[3], mgmt.getVolume("grid4"));
                     Thread.sleep(duration);
-              }
-                /*End of Main Program Loop*/
-  
-                //synth.close();
-            }
-            
+                }
+            }   
+            /*End of Main Program Loop*/
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -114,6 +123,13 @@ public class MusicApp {
         }
     }
 
+    public static void writeInstrumentsToFile(Instrument inst[]) {
+        PrintWriter writer = new PrintWriter("instruments.txt", "UTF-8");
+        for (int i = 0; i < inst.length; i++) {
+            // writer.println(inst[i].getName() + ",");
+        }
+    }
+
     public static boolean checkInstruments(Instrument inst1, Instrument inst2, Instrument inst3) {
         return inst1 != null && inst2 != null && inst3 != null;
     }
@@ -123,22 +139,31 @@ public class MusicApp {
         String key = null;
         int counter = 0;
         for (int i = 0; i < columnHeight; i++) {
-            if (pianoGrid[0][i]) {          //If this cell contains a true, increment our counter
-                counter++;
+            for (int j = 0; j < rowLength; j++) {
+                if (grid1[i][j]) {
+                    counter += i + j;
+                }
             }
         }
-        if (counter == 0 || counter == 4 || counter == 8 || counter == 12) {
+        
+        int keyModulus = counter % 4;   //4 Major Chords available
+        switch (keyModulus) {
+        case 0:
             key = "CMajor";
-        }
-        else if (counter == 1 || counter == 5 || counter == 9) {
+            break;
+        case 1:
             key = "GMajor";
-        } 
-        else if (counter == 2 || counter == 6 || counter == 10) {
+            break;
+        case 2:
             key = "DMajor";
-        }
-        else if (counter == 3 || counter == 7 || counter == 11) {
+            break;
+        case 3:
             key = "FMajor";
+            break;
+        default:
+            break;
         }
+
         return key;
     }
     
@@ -147,10 +172,10 @@ public class MusicApp {
         Progression[] band = new Progression[4];
         Progression[] tunedProgressions = new Progression[2];
         tunedProgressions = getTunedProgressions(pianoGrid, guitarGrid, key, duration);
-        band[0] = tunedProgressions[0];                             //Piano
-        band[1] = tunedProgressions[1];                             //Guitar
-        band[2] = getHiHatProgression(percussionGrid1, duration);   //Hi Hat
-        band[3] = getTomProgression(percussionGrid2,duration);      //Tom Drum
+        band[0] = tunedProgressions[0];                             
+        band[1] = tunedProgressions[1];                             
+        band[2] = getHiHatProgression(percussionGrid1, duration);   
+        band[3] = getTomProgression(percussionGrid2,duration);      
         
         return band;
     }
@@ -308,7 +333,7 @@ public class MusicApp {
         return noteType;
     }
     
-    public static Progression[] getTunedProgressions(boolean[][] grid1, boolean[][] grid2, String key, int duration) {
+    public static Progression[] getTunedProgressions(boolean[][] tuned1, boolean[][] tuned2, String key, int duration) {
         
         int[] quarterNotes = {0,1,2,3};
         int[] halfNotes = {0,2};
@@ -319,26 +344,35 @@ public class MusicApp {
         tunedProg[1] =  new Progression(MidiMaps.tunedMap(), duration);     //Guitar
         
         int numTrueCellsInColumn = 0;
-        int numTrueCellsInRow = 0;
+        int firstCellIndex = -1;
+        int lastCellIndex = -1;
+        
         String chord = null;
         String noteLengthPiano;
         String noteLengthGuitar;
         
         /*Parse Piano Grid*/
-        for (int j = 0; j < columnHeight; j++) {
-            for (int i = 0; i < rowLength; i++) {
-                if (grid1[i][j]) {
-                    numTrueCellsInRow++;                         //Count number of true cells in row
-                }
-                if (grid1[j][i]) {
-                    numTrueCellsInColumn++;                            //Count number of true cells in column. Used to determine chord/half/quarter notes
+        for (int i = 0; i < rowLength; i++) {
+            firstCellIndex = -1;
+            lastCellIndex = -1;
+            for (int j = 0; j < columnHeight; j++) {
+                if (tuned1[i][j]) {
+                    numTrueCellsInColumn++;                      //Count number of true cells in column. Used to determine duration
+                    
+                    if (firstCellIndex == -1) {                 //First cell we've seen
+                        firstCellIndex = j;
+                        lastCellIndex = j;
+                    } else {                                    //A new last cell has been found. Document it
+                        lastCellIndex = j;
+                    }
                 }
             }
-            chord = mapCellsToNote(numTrueCellsInColumn, key);        //This returns the specific chord as a String within a specified key.
-            noteLengthPiano = mapCellsToNoteLength(numTrueCellsInRow);    //Picks a note length used in the progression
+            int distance = lastCellIndex - firstCellIndex;                      //Calculate distance
+            chord = mapCellsToNote(distance, key);                              //This returns the specific chord as a String within a specified key.
+            noteLengthPiano = mapCellsToNoteLength(numTrueCellsInColumn);       //Picks a note length used in the progression
 
             if (numTrueCellsInColumn == 0) {
-                noteLengthPiano = "rest";                           //We want a rest here
+                noteLengthPiano = "rest";                                       //We want a rest here
             }
 
             System.out.println(noteLengthPiano);
@@ -360,22 +394,28 @@ public class MusicApp {
                 break;
             }
             numTrueCellsInColumn = 0;
-            numTrueCellsInRow = 0;
         }
         
         /*Parse Guitar Grid*/
-        int numTruePianoCells = 0;                                  //Used to set chords for guitar
-        for (int j = 0; j < columnHeight; j++) {
-            for (int i = 0; i < rowLength; i++) {
-                if (grid2[j][i]) {
+        for (int i = 0; i < rowLength; i++) {
+            firstCellIndex = -1;
+            lastCellIndex = -1;
+            for (int j = 0; j < columnHeight; j++) {
+                if (tuned2[i][j]) {
                     numTrueCellsInColumn++;                         //Count number of true cells in column
-                }
-                if (grid1[i][j]) {
-                    numTruePianoCells++;                            //Count number of true cells in column
+                    
+                    if (firstCellIndex == -1) {                 //First cell we've seen
+                        firstCellIndex = j;
+                        lastCellIndex = j;
+                    } else {                                    //A new last cell has been found. Document it
+                        lastCellIndex = j;
+                    }
                 }
             }
+            int distance = lastCellIndex - firstCellIndex;                      //Calculate distance
+            chord = mapCellsToNote(distance, key);                          //Pick same chord as piano
             noteLengthGuitar = mapCellsToNoteLength(numTrueCellsInColumn);    //Picks a note length used in the progression
-            chord = mapCellsToNote(numTruePianoCells, key);                   //Pick same chord as piano
+            
 
             if (numTrueCellsInColumn == 0) {
                 noteLengthGuitar = "rest";                           //We want a rest here
@@ -398,8 +438,6 @@ public class MusicApp {
                 break;
             }
             numTrueCellsInColumn = 0;
-            numTrueCellsInRow = 0;
-            numTruePianoCells = 0;
         }
         
         return tunedProg;
