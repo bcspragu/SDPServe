@@ -138,12 +138,18 @@ func initDB() {
 			return err
 		}
 
+		var def Preset
 		d := b.Get([]byte("Default"))
 		if d == nil {
 			// Create the Default Preset
-			def := DefaultPreset()
+			def = DefaultPreset()
 			savePreset("Default", def, tx)
+		} else {
+			buf := bytes.NewBuffer(d)
+			dec := gob.NewDecoder(buf)
+			dec.Decode(&def)
 		}
+		settings = def.Settings
 
 		return err
 	})
