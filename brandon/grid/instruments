@@ -5,15 +5,15 @@ Honky-tonk Piano,1
 Electric Piano 1,1
 Electric Piano 2,1
 Harpsichord,1
-Clavi,1
-Celesta,1
-Glockenspiel,1
-Music Box,1
-Vibraphone,1
-Marimba,1
-Xylophone,1
-Tubular Bells,1
-Dulcimer,1
+Clavi,0
+Celesta,0
+Glockenspiel,0
+Music Box,0
+Vibraphone,0
+Marimba,0
+Xylophone,0
+Tubular Bells,0
+Dulcimer,0
 Drawbar Organ,1
 Percussive Organ,1
 Rock Organ,1
@@ -45,13 +45,13 @@ Contrabass,1
 Tremolo Strings,1
 Pizzicato Strings,1
 Orchestral Harp,1
-Timpani,1
+Timpani,0
 String Ensemble 1,1
 String Ensemble 2,1
 SynthStrings 1,1
 SynthStrings 2,1
-Choir Aahs,1
-Voice Oohs,1
+Choir Aahs,0
+Voice Oohs,0
 Synth Voice,1
 Orchestra Hit,1
 Trumpet,1
@@ -75,9 +75,9 @@ Flute,1
 Recorder,1
 Pan Flute,1
 Blown Bottle,1
-Shakuhachi,1
-Whistle,1
-Ocarina,1
+Shakuhachi,0
+Whistle,0
+Ocarina,0
 Lead 1 (square),1
 Lead 2 (sawtooth),1
 Lead 3 (calliope),1
@@ -86,22 +86,22 @@ Lead 5 (charang),1
 Lead 6 (voice),1
 Lead 7 (fifths),1
 Lead 8 (bass + lead),1
-Pad 1 (new age),1
-Pad 2 (warm),1
-Pad 3 (polysynth),1
-Pad 4 (choir),1
-Pad 5 (bowed),1
-Pad 6 (metallic),1
-Pad 7 (halo),1
-Pad 8 (sweep),1
-FX 1 (rain),1
-FX 2 (soundtrack),1
-FX 3 (crystal),1
-FX 4 (atmosphere),1
-FX 5 (brightness),1
-FX 6 (goblins),1
-FX 7 (echoes),1
-FX 8 (sci-fi),1
+Pad 1 (new age),0
+Pad 2 (warm),0
+Pad 3 (polysynth),0
+Pad 4 (choir),0
+Pad 5 (bowed),0
+Pad 6 (metallic),0
+Pad 7 (halo),0
+Pad 8 (sweep),0
+FX 1 (rain),0
+FX 2 (soundtrack),0
+FX 3 (crystal),0
+FX 4 (atmosphere),0
+FX 5 (brightness),0
+FX 6 (goblins),0
+FX 7 (echoes),0
+FX 8 (sci-fi),0
 Sitar,1
 Banjo,1
 Shamisen,1
@@ -110,20 +110,20 @@ Kalimba,1
 Bag pipe,1
 Fiddle,1
 Shanai,1
-Tinkle Bell,1
-Agogo,1
-Steel Drums,1
-Woodblock,1
-Taiko Drum,1
-Melodic Tom,1
-Synth Drum,1
-Reverse Cymbal,1
-Guitar Fret Noise,1
-Breath Noise,1
-Seashore,1
-Bird Tweet,1
-Telephone Ring,1
-Helicopter,1
-Applause,1
-Gunshot,1
-Standard Kit,1
+Tinkle Bell,0
+Agogo,0
+Steel Drums,0
+Woodblock,0
+Taiko Drum,0
+Melodic Tom,0
+Synth Drum,0
+Reverse Cymbal,0
+Guitar Fret Noise,0
+Breath Noise,0
+Seashore,0
+Bird Tweet,0
+Telephone Ring,0
+Helicopter,0
+Applause,0
+Gunshot,0
+Standard Kit,0

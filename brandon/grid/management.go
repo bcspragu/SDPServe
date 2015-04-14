@@ -63,6 +63,7 @@ func serveSettings(w http.ResponseWriter, r *http.Request) {
 }
 
 func setSettings(w http.ResponseWriter, r *http.Request) {
+	resp := make(map[string]string)
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", 405)
 		return
@@ -77,8 +78,28 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 			}
 		case "snapshot":
 			savePreset(val, Preset{settings, grids}, nil)
+		case "velocity":
+			id, _ := strconv.Atoi(r.PostFormValue("id"))
+			vel, _ := strconv.Atoi(val)
+			for i, inst := range settings.Instruments {
+				if id == inst.ID {
+					settings.Instruments[i].Velocity = vel
+				}
+			}
+		case "instrumentID":
+			id, _ := strconv.Atoi(r.PostFormValue("id"))
+			newID, _ := strconv.Atoi(val)
+			for i, inst := range settings.Instruments {
+				if id == inst.ID {
+					settings.Instruments[i].Instrument = instruments[newID]
+				}
+			}
 		}
 	}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	respString, _ := json.Marshal(resp)
+	fmt.Fprint(w, string(respString))
 }
 
 func presets() map[string]Preset {
@@ -130,7 +151,7 @@ func (p Preset) SettingsJSON() (string, error) {
 }
 
 func DefaultPreset() Preset {
-	preset := Preset{}
+	preset := Preset{Settings: Settings{Duration: 100}}
 	preset.Instruments = []ActiveInstrument{
 		{instruments[0], 100},
 		{instruments[24], 100},
@@ -138,4 +159,14 @@ func DefaultPreset() Preset {
 	}
 	preset.Grids = grids
 	return preset
+}
+
+func (inst Instrument) Similar() []Instrument {
+	insts := make([]Instrument, 0)
+	for _, in := range instruments {
+		if in.Tuned == inst.Tuned {
+			insts = append(insts, in)
+		}
+	}
+	return insts
 }

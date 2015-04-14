@@ -16,6 +16,11 @@ h1, h2, .icon {
   font-size: 3em;
 }
 
+.instrument .icon {
+  margin-top: 6px;
+  font-size: 2em;
+}
+
 .icon-right {
   float: right;
 }
