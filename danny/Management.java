@@ -22,6 +22,7 @@ public class Management {
         JSONArray inst0 = (JSONArray)mgmt.get(0);       //Grid1
         JSONArray inst1 = (JSONArray)mgmt.get(1);       //Grid2
         JSONArray inst2 = (JSONArray)mgmt.get(2);       //Grid3
+        JSONArray inst3 = (JSONArray)mgmt.get(3);       //Grid4
 
         /*ID Numbers for Instruments*/
         idNums.put("grid1", inst0.getInt("id"));
@@ -31,6 +32,7 @@ public class Management {
         volumes.put("grid1", inst0.getInt("velocity"));
         volumes.put("grid2", inst1.getInt("velocity"));
         volumes.put("grid3", inst2.getInt("velocity"));
+        volumes.put("grid4", inst3.getInt("velocity"));
         /*Tuning Info for Instruments*/
         isTuned.put("grid1", inst0.getInt("tuned"));
         isTuned.put("grid2", inst1.getInt("tuned"));
