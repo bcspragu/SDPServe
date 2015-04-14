@@ -15,8 +15,8 @@ type Preset struct {
 }
 
 type Settings struct {
-	Duration          int
-	ActiveInstruments []ActiveInstrument
+	Duration    int
+	Instruments []ActiveInstrument
 }
 
 type Instrument struct {
