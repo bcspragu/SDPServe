@@ -61,7 +61,7 @@ public class MusicApp {
                     GenericPlayer gp4;
 
                     /*Determine Channels for Grid1. Need to know whether instrument is tuned from Management.*/
-                    if (mgmt.getTuned("Red") == 1) {
+                    if (mgmt.getTuned("Red")) {
                         //Tuned requires 4 channels
                         channels[0].programChange(gridPatch1.getBank(), gridPatch1.getProgram());
                         channels[1].programChange(gridPatch1.getBank(), gridPatch1.getProgram());
@@ -74,7 +74,7 @@ public class MusicApp {
                         gp1 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{0});
                     }
                     /*Determine Channels for Grid2. Need to know whether instrument is tuned from Management.*/
-                    if (mgmt.getTuned("Orange") == 1) {
+                    if (mgmt.getTuned("Orange")) {
                         //Tuned requires 4 channels
                         channels[4].programChange(gridPatch2.getBank(), gridPatch2.getProgram());
                         channels[5].programChange(gridPatch2.getBank(), gridPatch2.getProgram());
@@ -87,7 +87,7 @@ public class MusicApp {
                         gp2 = new GenericPlayer(MidiMaps.percussionMap(), channels, new int[]{4});
                     }
                     /*Determine Channels for Grid3. Need to know whether instrument is tuned from Management.*/
-                    if (mgmt.getTuned("Blue") == 1) {
+                    if (mgmt.getTuned("Blue")) {
                         //Tuned requires 4 channels
                         channels[8].programChange(gridPatch3.getBank(), gridPatch3.getProgram());
                         channels[10].programChange(gridPatch3.getBank(), gridPatch3.getProgram());
@@ -111,7 +111,7 @@ public class MusicApp {
                     gp1.play(progs[0], (int)((1.27)*mgmt.getVolume("Red")));
                     gp2.play(progs[1], (int)((1.27)*mgmt.getVolume("Orange")));
                     gp3.play(progs[2], (int)((1.27)*mgmt.getVolume("Blue")));
-                    gp4.play(progs[3], (int)((1.27)*mgmt.getVolume("Green")));
+                    gp4.play(progs[3], 127);
                     Thread.sleep(duration);
                 }
             }   

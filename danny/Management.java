@@ -9,36 +9,34 @@ public class Management {
     int duration;
     static Map<String, Integer> idNums;
     static Map<String, Integer> volumes;
-    static Map<String, Integer> isTuned;
+    static Map<String, Boolean> isTuned;
 
     public Management(JSONObject obj) {
-        duration = (int)(obj.get("Duration"));
+        duration = ((Number)(obj.get("Duration"))).intValue();
         idNums = new HashMap<String, Integer>();
         volumes = new HashMap<String, Integer>();
-        isTuned = new HashMap<String, Integer>();
+        isTuned = new HashMap<String, Boolean>();
 
-        jsonArrayToMaps((JSONObject)obj.get("Instruments"));
+        jsonArrayToMaps((JSONArray)obj.get("Instruments"));
     }
 
-    public static void jsonArrayToMaps(JSONObject mgmt) {
+    public static void jsonArrayToMaps(JSONArray mgmt) {
         JSONObject inst0 = (JSONObject)(mgmt.get(0));       //Grid1
         JSONObject inst1 = (JSONObject)(mgmt.get(1));       //Grid2
         JSONObject inst2 = (JSONObject)(mgmt.get(2));       //Grid3
-        JSONObject inst3 = (JSONObject)(mgmt.get(3));       //Grid4
 
         /*ID Numbers for Instruments*/
-        idNums.put("Red", (int)(inst0.get("ID")));
-        idNums.put("Orange", (int)(inst1.get("ID")));
-        idNums.put("Blue", (int)(inst2.get("ID")));
+        idNums.put("Red", ((Number)(inst0.get("ID"))).intValue());
+        idNums.put("Orange", ((Number)(inst1.get("ID"))).intValue());
+        idNums.put("Blue", ((Number)(inst2.get("ID"))).intValue());
         /*Volumes for Instruments*/
-        volumes.put("Red", (int)(inst0.get("Velocity")));
-        volumes.put("Orange", (int)(inst1.get("Velocity")));
-        volumes.put("Blue", (int)(inst2.get("Velocity")));
-        volumes.put("Green", (int)(inst3.get("Velocity")));
+        volumes.put("Red", ((Number)(inst0.get("Velocity"))).intValue());
+        volumes.put("Orange", ((Number)(inst1.get("Velocity"))).intValue());
+        volumes.put("Blue", ((Number)(inst2.get("Velocity"))).intValue());
         /*Tuning Info for Instruments*/
-        isTuned.put("Red", (int)(inst0.get("Tuned")));
-        isTuned.put("Orange", (int)(inst1.get("Tuned")));
-        isTuned.put("Blue", (int)(inst2.get("Tuned")));
+        isTuned.put("Red", ((Boolean)(inst0.get("Tuned"))));
+        isTuned.put("Orange", ((Boolean)(inst1.get("Tuned"))));
+        isTuned.put("Blue", ((Boolean)(inst2.get("Tuned"))));
     }
 
     public int getID(String grid) {
@@ -49,7 +47,7 @@ public class Management {
         return volumes.get(grid);
     }
 
-    public int getTuned(String grid) {
+    public Boolean getTuned(String grid) {
         return isTuned.get(grid);
     }
 
