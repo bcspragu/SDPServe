@@ -163,13 +163,12 @@ func instrumentsToDB(b *bolt.Bucket) error {
 	lines = lines[:len(lines)-1]
 	instruments = make([]Instrument, len(lines))
 
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
 	for i, line := range lines {
+		var buf bytes.Buffer
+		enc := gob.NewEncoder(&buf)
 		s := strings.Split(line, ",")
 		inst := Instrument{ID: i, Name: s[0], Tuned: s[1] == "1"}
 		instruments[i] = inst
-		log.Println(inst)
 		err = enc.Encode(inst)
 		if err != nil {
 			return err
@@ -183,8 +182,8 @@ func instrumentsToDB(b *bolt.Bucket) error {
 	return nil
 }
 
-func instrumentsFromDB(b *bolt.Bucket) []Instrument {
-	insts := make([]Instrument, b.Stats().KeyN)
+func instrumentsFromDB(b *bolt.Bucket) {
+	instruments := make([]Instrument, b.Stats().KeyN)
 	i := 0
 	var inst Instrument
 	b.ForEach(func(k, v []byte) error {
@@ -194,11 +193,8 @@ func instrumentsFromDB(b *bolt.Bucket) []Instrument {
 		if err != nil {
 			return err
 		}
-		log.Println(inst)
-		insts[i] = inst
+		instruments[inst.ID] = inst
 		i++
 		return err
 	})
-
-	return insts
 }
