@@ -14,6 +14,9 @@ var mainMargin = 6;
 
 var id;
 
+var dragging = false;
+var mode = false;
+
 $(function () {
   id = makeID();
   mainGrid = $('.main-grid');
@@ -24,8 +27,27 @@ $(function () {
   initWebsockets();
 
   // When we click on the main grid, we want to update the grid locally and on the server
-  $('.main-grid').on('click', '.cell', function () {
+  $('.main-grid').on('mousedown touchstart', '.cell', function () {
+    mode = !$(this).hasClass('active');
     $(this).cellTrigger();
+  });
+
+  $('.main-grid').on('mouseover', '.cell', function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    if (dragging) {
+      $(this).cellTrigger();
+    }
+  });
+
+  $(document).mousedown(function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    dragging = true;
+  }).mouseup(function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    dragging = false;
   });
 
 
@@ -144,11 +166,12 @@ jQuery.fn.extend({
   // Gets cell parent grid and coordinates and state, then sends it to server
   cellTrigger: function () {
     var cell = $(this[0]);
-    
-    // Cell is on
-    var on = !cell.hasClass('active');
 
-    cell.toggleClass('active', fadeTime);
+    if (mode) {
+      cell.addClass('active', fadeTime);
+    } else {
+      cell.removeClass('active', fadeTime);
+    }
     cell.addClass('animated pulse');
 
     // Our x location is our index in the row
@@ -159,7 +182,7 @@ jQuery.fn.extend({
     var name = cell.parents('.grid').data('name');
 
     // Build the message from various DOM attributes
-    var message = JSON.stringify({type: 'tap', on: on, x: xLoc, y: yLoc, name: name, id: id, sent: Date.now()});
+    var message = JSON.stringify({type: 'tap', on: mode, x: xLoc, y: yLoc, name: name, id: id, sent: Date.now()});
     // Send the message to the server via WebSockets
     conn.send(message);
   }
