@@ -58,6 +58,7 @@ h1, h2, .icon {
                0 5px 10px rgba(0,0,0,.25),
                0 10px 10px rgba(0,0,0,.2),
                0 20px 20px rgba(0,0,0,.15);
+  pointer-events: none;
 }
 
 .grid {
@@ -74,10 +75,14 @@ h1, h2, .icon {
   float: left;
 }
 
+.cell-inner {
+  height: 95%;
+  width: 95%;
+  pointer-events: none;
+}
+
 .main-grid {
   height: 75%;
-  margin-top: 5px;
-  margin-left: 5px;
 }
 
 .main-grid .label {
@@ -88,14 +93,6 @@ h1, h2, .icon {
   font-size: 2em;
 }
 
-.main-grid > .row {
-  margin-bottom: 6px;
-}
-
-.main-grid > .row > .cell {
-  margin-right: 6px;
-}
-
 .mini-grids {
   height: 25%;
 }
@@ -104,15 +101,6 @@ h1, h2, .icon {
   height: 100%;
   float: left;
 }
-
-.mini-grid > .row {
-  margin-bottom: 2px;
-}
-
-.mini-grid > .row > .cell {
-  margin-right: 2px;
-}
-
 
 .animated {
   -webkit-animation-duration: 0.2s;
@@ -224,11 +212,11 @@ h1, h2, .icon {
 }
 
 {{ range $name, $grid := .Grids }}
-  {{ $grid.AsCSSClass }} .cell {
+  {{ $grid.AsCSSClass }} .cell-inner {
     background-color: {{ $grid.OffColor }};
   }
 
-  {{ $grid.AsCSSClass }} .cell.active {
+  {{ $grid.AsCSSClass }} .active > .cell-inner {
     background-color: {{ $grid.OnColor }};
   }
 {{ end }}

@@ -9,9 +9,6 @@ var conn;
 // Number of milliseconds for fade animation
 var fadeTime = 100;
 
-var miniMargin = 2;
-var mainMargin = 6;
-
 var id;
 
 var dragging = false;
@@ -27,13 +24,13 @@ $(function () {
   initWebsockets();
 
   // When we click on the main grid, we want to update the grid locally and on the server
-  $('.main-grid').on('mousedown touchstart', '.cell', function () {
+  $('.main-grid').on('mousedown touchstart', '.cell', function (e) {
+    e.preventDefault();
     mode = !$(this).hasClass('active');
     $(this).cellTrigger();
   });
 
   $('.main-grid').on('mouseover', '.cell', function (e) {
-    e.stopPropagation();
     e.preventDefault();
     if (dragging) {
       $(this).cellTrigger();
@@ -59,14 +56,16 @@ $(function () {
       $(this).remove();
   });
 
-  $('.main-grid').on('touchstart', function (evt) {
-    evt.preventDefault();
-    var touches = evt.originalEvent.changedTouches;
+  $('.main-grid').on('touchmove', '.cell', function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    var touches = e.originalEvent.changedTouches;
     for (var i = 0; i < touches.length; i++) {
-      var touch = $(touches[i].target);
-
+      var x = touches[i].pageX;
+      var y = touches[i].pageY;
+      var touch = $(document.elementFromPoint(x,y));
       // If we didn't click on a cell, ignore it
-      if (touch.hasClass('cell')) {
+      if (touch.parents('.main-grid').length > 0) {
         touch.cellTrigger();
       }
     }
@@ -107,7 +106,7 @@ jQuery.fn.extend({
 
       for (var j = 0; j < xSize; j++) {
         // Create a new cell, add it to the DOM row, size it appropriately
-        var cell = $('<div class="cell"></div>');
+        var cell = $('<div class="cell"><div class="cell-inner"></div></div>');
         row.append(cell);
         // If this cell is active, make it active
         if (gridData[j][i]) {
@@ -151,21 +150,21 @@ jQuery.fn.extend({
     var width = gridHolder.width();
     var height = gridHolder.height();
 
-    // Margin is 5px for main grid, 2px for mini grid
-    var margin = gridHolder.hasClass("mini-grid") ? miniMargin : mainMargin;
-
     // The number of rows is the number of divs with the class row
     var rowCount = gridHolder.find('.row').length
     // The number of cells per row should be the same in a given grid, so we
     // find the number of divs with the class cell in the first row we find
     var cellCount = gridHolder.find('.row:first > .cell').length
 
-    gridHolder.find('.row').height(Math.floor(height/rowCount) - margin);
-    gridHolder.find('.cell').width(Math.floor(width/cellCount) - margin);
+    gridHolder.find('.row').height(Math.floor(height/rowCount));
+    gridHolder.find('.cell').width(Math.floor(width/cellCount));
   },
   // Gets cell parent grid and coordinates and state, then sends it to server
   cellTrigger: function () {
     var cell = $(this[0]);
+    if (cell.hasClass('.cell-inner')) {
+      cell = cell.parents('.cell');
+    }
 
     if (mode) {
       cell.addClass('active', fadeTime);
@@ -178,7 +177,6 @@ jQuery.fn.extend({
     var xLoc = cell.index();
     // Our y location is our row's index in the grid
     var yLoc = cell.parents('.row').index();
-
     var name = cell.parents('.grid').data('name');
 
     // Build the message from various DOM attributes
@@ -217,7 +215,7 @@ function loadGrids(gridData) {
       } else {
         var miniGrid = $('<div class="mini-grid grid"></div>');
         miniGrids.append(miniGrid);
-        miniGrid.width(Math.ceil(miniGrids.width()/miniGridCount) - miniMargin);
+        miniGrid.width(Math.floor(miniGrids.width()/miniGridCount));
         miniGrid.loadGrid(gridName, displayName, grids[gridName].Grid);
       }
     }
@@ -266,7 +264,7 @@ function resizeGrids() {
 
   // The width of each minigrid is the space allocated for all of the
   // minigrids divided by how many minigrids there are
-  allMiniGrids.width(Math.ceil(miniGrids.width() / allMiniGrids.length) - miniMargin);
+  allMiniGrids.width(Math.floor(miniGrids.width() / allMiniGrids.length));
   
   $('.grid').each(function () {
     var gridHolder = $(this);
