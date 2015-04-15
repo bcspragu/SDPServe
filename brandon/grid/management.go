@@ -75,6 +75,7 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 			p := presets()[val]
 			settings = p.Settings
 			grids = p.Grids
+			broadcastData()
 		}
 	}
 	w.WriteHeader(http.StatusOK)
@@ -86,4 +87,17 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 func (p Preset) SettingsJSON() (string, error) {
 	b, err := json.Marshal(p.Settings)
 	return string(b), err
+}
+
+func broadcastData() {
+	data := struct {
+		Type     string `json:"type"`
+		GridData Preset
+	}{
+		"preset",
+		Preset{settings, grids},
+	}
+
+	dataString, _ := json.Marshal(data)
+	h.broadcast <- dataString
 }

@@ -10,6 +10,8 @@ import (
 type Stats struct {
 	TotalClicks   int64
 	TotalResponse int64
+	MinResponse   int
+	MaxResponse   int
 	GridClicks    map[string]int64
 	ActiveUsers   int
 }

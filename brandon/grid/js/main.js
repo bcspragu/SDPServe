@@ -62,11 +62,12 @@ $(function () {
 jQuery.fn.extend({
   // Given a name and 2D array of booleans, initialize a DOM element as a
   // grid
-  loadGrid: function (gridName, gridData) {
+  loadGrid: function (gridName, displayName, gridData) {
     // Selector should only have a single element
     var gridHolder = $(this[0]);
     // Store the name of the grid on the holder
     gridHolder.data("name", gridName);
+    gridHolder.data("display-name", displayName);
     gridHolder.addClass(nameToClass(gridName));
     
     // We need the length, width, and x/y sizes to compute the size of each
@@ -122,7 +123,7 @@ jQuery.fn.extend({
     gridHolder.find('.label').remove();
 
     var label = $('<div class="label animated-slow fadeOut"></div>');
-    label.text(gridHolder.data('name'));
+    label.text(gridHolder.data('display-name'));
     gridHolder.append(label);
 
     var width = gridHolder.width();
@@ -172,24 +173,29 @@ function loadGrids(gridData) {
 
   // Start at -1 because the first one goes in the main grid
   var miniGridCount = -1;
-  for (var gridName in gridData) {
-    if (gridData.hasOwnProperty(gridName)) {
+  var grids = gridData.Grids;
+  var instruments = gridData.Instruments;
+  
+  for (var gridName in grids) {
+    if (grids.hasOwnProperty(gridName)) {
       miniGridCount++;
     }
   }
 
   var isMainGrid = true;
-  for (var gridName in gridData) {
-    if (gridData.hasOwnProperty(gridName)) {
+  for (var gridName in grids) {
+    var grid = grids[gridName];
+    var displayName = instruments[grid.Index].Name;
+    if (grids.hasOwnProperty(gridName)) {
       // Fill the main grid first
       if (isMainGrid) {
         isMainGrid = false;
-        mainGrid.loadGrid(gridName, gridData[gridName].Grid);
+        mainGrid.loadGrid(gridName, displayName, grids[gridName].Grid);
       } else {
         var miniGrid = $('<div class="mini-grid grid"></div>');
         miniGrids.append(miniGrid);
         miniGrid.width(Math.ceil(miniGrids.width()/miniGridCount) - miniMargin);
-        miniGrid.loadGrid(gridName, gridData[gridName].Grid);
+        miniGrid.loadGrid(gridName, displayName, grids[gridName].Grid);
       }
     }
   }
@@ -209,18 +215,18 @@ function initWebsockets() {
         // Parse the JSON out of the data
         var data = JSON.parse(evt.data);
 
-        if (data.type != 'tap') {
-          return;
+        if (data.type == 'tap') {
+          if (data.id == id) {
+            var requestTime = (Date.now() - data.sent);
+            $.post('/avg', {requestDuration: requestTime});
+          }
+          // Select our grid by the name passed to us
+          var grid = $(nameAsCssClass(data.name));
+          // Use the other attributes to figure out which cell to set
+          grid.setBlock(data.x, data.y, data.on);
+        } else if (data.type == 'preset') {
+          loadGrids(data.GridData);
         }
-        
-        if (data.id == id) {
-          var requestTime = (Date.now() - data.sent);
-          $.post('/avg', {requestDuration: requestTime});
-        }
-        // Select our grid by the name passed to us
-        var grid = $(nameAsCssClass(data.name));
-        // Use the other attributes to figure out which cell to set
-        grid.setBlock(data.x, data.y, data.on);
       }
   } else {
       // Your browser does not support WebSockets
@@ -259,6 +265,9 @@ function swapGrids(grid1, grid2) {
   var name1 = grid1.data('name');
   var name2 = grid2.data('name');
 
+  var dName1 = grid1.data('display-name');
+  var dName2 = grid2.data('display-name');
+
   grid1.removeClass(nameToClass(name1));
   grid2.removeClass(nameToClass(name2));
 
@@ -267,6 +276,9 @@ function swapGrids(grid1, grid2) {
 
   grid1.data('name', name2);
   grid2.data('name', name1);
+
+  grid1.data('display-name', dName2);
+  grid2.data('display-name', dName1);
 
   var html1 = grid1.html();
   grid1.html(grid2.html());

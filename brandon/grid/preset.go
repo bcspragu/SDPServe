@@ -28,11 +28,12 @@ type ActiveInstrument struct {
 }
 
 func DefaultPreset() Preset {
-	preset := Preset{Settings: Settings{Duration: 100}}
+	preset := Preset{Settings: Settings{Duration: 50}}
 	preset.Instruments = []ActiveInstrument{
 		{instruments[0], 100},
 		{instruments[24], 100},
 		{instruments[117], 100},
+		{Instrument{-1, "Drums", false}, 100},
 	}
 	preset.Grids = grids
 	return preset

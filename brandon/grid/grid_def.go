@@ -17,6 +17,7 @@ type GridDef struct {
 	OnColor  string
 	OffColor string
 	Name     string
+	Index    int
 	Grid     Grid
 }
 
