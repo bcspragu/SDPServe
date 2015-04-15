@@ -1,35 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>BeatBeam</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-<link type="text/css" rel="stylesheet" href="/css/main.css">
-<script src="/js/jquery.min.js"></script>
-<script src="/js/jquery.ui.min.js"></script>
-<script src="/js/jquery.color.min.js"></script>
-<script type="text/javascript">
-  // TODO: Maybe make this loaded after page to simplify things? Maybe?
-  // Starting grid from server
-  var startGrid = JSON.parse('{{ .Grids }}');
-  // Host also comes from server
-  var host = "{{ .Host }}";
-  "{{.Colors}}"
-</script>
-<style type="text/css">
-  {{ range $class, $colors := .Colors }}
-    {{$class}} .cell {
-      background-color: {{ $colors.Off }};
-    }
-
-    {{$class}} .cell.active {
-      background-color: {{ $colors.On }};
-    }
-  {{ end }}
-</style>
-<script src="js/main.js"></script>
-</head>
-<body>
-  <div class="main-grid grid"></div>
-  <div class="mini-grids"></div>
-</body>
-</html>
+{{ template "header" . }}
+<div class="main-grid grid"></div>
+<div class="mini-grids"></div>
+<script src="/js/main.js"></script>
+{{ template "footer" .}}

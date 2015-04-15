@@ -12,7 +12,8 @@ public class Grids {
     Iterator iter = obj.entrySet().iterator();
     while(iter.hasNext()){
       Map.Entry entry = (Map.Entry)iter.next();
-      grids.put((String)entry.getKey(), jsonArrayToGrid((JSONArray)entry.getValue()));
+      JSONArray arr = ((JSONArray)(((JSONObject)entry.getValue()).get("Grid")));
+      grids.put((String)entry.getKey(), jsonArrayToGrid(arr));
     }
   }
 

@@ -9,8 +9,6 @@ import (
 	"strings"
 )
 
-type Grid [][]bool
-
 var unwantedChars = ".-_+!@#$%^&*()="
 
 func NewGrid(x, y int) Grid {

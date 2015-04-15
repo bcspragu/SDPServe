@@ -46,6 +46,8 @@ type connection struct {
 func (c *connection) readPump() {
 	defer func() {
 		h.unregister <- c
+		stats.ActiveUsers--
+		broadcastStats()
 		c.ws.Close()
 	}()
 	c.ws.SetReadLimit(maxMessageSize)
@@ -104,6 +106,8 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 	}
 	c := &connection{send: make(chan []byte, 256), ws: ws}
 	h.register <- c
+	stats.ActiveUsers++
+	broadcastStats()
 	go c.writePump()
 	c.readPump()
 }

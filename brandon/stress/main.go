@@ -9,7 +9,7 @@ import (
 )
 
 // Simulate 20 people using it at once
-const WorkerCount = 20
+const WorkerCount = 10
 
 type block struct {
 	On   bool   `json:"on"`
@@ -26,7 +26,7 @@ func worker(done chan<- bool) {
 	dialer := websocket.DefaultDialer
 	header := http.Header{}
 	header.Set("Origin", "http://bsprague.com")
-	conn, _, err := dialer.Dial("ws://bsprague.com/ws", header)
+	conn, _, err := dialer.Dial("ws://192.168.2.1:8080/ws", header)
 	if err != nil {
 		fmt.Println("Error connecting to server", err)
 		done <- true
@@ -37,7 +37,7 @@ func worker(done chan<- bool) {
 	go readLoop(conn)
 
 	// Tick regularly somewhere between every 25 and 75 ms
-	ticker := time.NewTicker(time.Millisecond * time.Duration(rand.Int63n(51)+25))
+	ticker := time.NewTicker(time.Millisecond * time.Duration(rand.Int63n(500)+250))
 
 	for _ = range ticker.C {
 		if err := conn.WriteJSON(randomBlock()); err != nil {
@@ -75,6 +75,6 @@ func main() {
 
 func randomBlock() block {
 	x, y, on := rand.Intn(10), rand.Intn(10), rand.Intn(2) == 0
-	name := []string{"Piano", "Drums", "Guitar", "Flute"}[rand.Intn(4)]
+	name := []string{"Piano", "Drum1", "Guitar", "Drum2"}[rand.Intn(4)]
 	return block{on, x, y, name}
 }

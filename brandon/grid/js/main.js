@@ -14,8 +14,8 @@ var mainMargin = 6;
 
 var id;
 
-var requestCount = 0;
-var requestTime = 0;
+var dragging = false;
+var mode = false;
 
 $(function () {
   id = makeID();
@@ -27,19 +27,36 @@ $(function () {
   initWebsockets();
 
   // When we click on the main grid, we want to update the grid locally and on the server
-  $('.main-grid').on('click', '.cell', function () {
-    $(this).ripple();
+  $('.main-grid').on('mousedown touchstart', '.cell', function () {
+    mode = !$(this).hasClass('active');
     $(this).cellTrigger();
+  });
+
+  $('.main-grid').on('mouseover', '.cell', function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    if (dragging) {
+      $(this).cellTrigger();
+    }
+  });
+
+  $(document).mousedown(function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    dragging = true;
+  }).mouseup(function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    dragging = false;
   });
 
 
   $('.main-grid, .mini-grids').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', '.cell', function() {
-    var cell = $(this);
-    if (cell.hasClass('pulse')) {
-      cell.removeClass('animated pulse');
-    } else if (cell.hasClass('fadeOut')) {
-      cell.remove();
-    }
+      $(this).removeClass('animated pulse');
+  });
+
+  $('body').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', '.label', function() {
+      $(this).remove();
   });
 
   $('.main-grid').on('touchstart', function (evt) {
@@ -67,11 +84,12 @@ $(function () {
 jQuery.fn.extend({
   // Given a name and 2D array of booleans, initialize a DOM element as a
   // grid
-  loadGrid: function (gridName, gridData) {
+  loadGrid: function (gridName, displayName, gridData) {
     // Selector should only have a single element
     var gridHolder = $(this[0]);
     // Store the name of the grid on the holder
     gridHolder.data("name", gridName);
+    gridHolder.data("display-name", displayName);
     gridHolder.addClass(nameToClass(gridName));
     
     // We need the length, width, and x/y sizes to compute the size of each
@@ -109,11 +127,6 @@ jQuery.fn.extend({
                  .find('.row:eq(' + y + ')')
                  .find('.cell:eq(' + x + ')');
 
-   // Only start the ripple if we aren't already in that state
-   if ((cell.hasClass('active') && !on)
-       || (!cell.hasClass('active') && on)) {
-     cell.ripple();
-   }
    // Turn the cell on or off
    if (on) {
      cell.addClass('active', fadeTime);
@@ -121,6 +134,10 @@ jQuery.fn.extend({
      cell.removeClass('active', fadeTime);
    }
 
+   // Pulse
+   if (!cell.hasClass('pulse')) {
+     cell.addClass('animated pulse');
+   }
   },
   // Sets the size of the cells relative to the size of the given grid
   resizeCells: function () {
@@ -128,7 +145,7 @@ jQuery.fn.extend({
     gridHolder.find('.label').remove();
 
     var label = $('<div class="label animated-slow fadeOut"></div>');
-    label.text(gridHolder.data('name'));
+    label.text(gridHolder.data('display-name'));
     gridHolder.append(label);
 
     var width = gridHolder.width();
@@ -149,11 +166,13 @@ jQuery.fn.extend({
   // Gets cell parent grid and coordinates and state, then sends it to server
   cellTrigger: function () {
     var cell = $(this[0]);
-    
-    // Cell is on
-    var on = !cell.hasClass('active');
 
-    cell.toggleClass('active', fadeTime);
+    if (mode) {
+      cell.addClass('active', fadeTime);
+    } else {
+      cell.removeClass('active', fadeTime);
+    }
+    cell.addClass('animated pulse');
 
     // Our x location is our index in the row
     var xLoc = cell.index();
@@ -163,49 +182,9 @@ jQuery.fn.extend({
     var name = cell.parents('.grid').data('name');
 
     // Build the message from various DOM attributes
-    var message = JSON.stringify({on: on, x: xLoc, y: yLoc, name: name, id: id, sent: Date.now()});
+    var message = JSON.stringify({type: 'tap', on: mode, x: xLoc, y: yLoc, name: name, id: id, sent: Date.now()});
     // Send the message to the server via WebSockets
     conn.send(message);
-  },
-  // Animates the cells around us when we're done
-  ripple: function () {
-    var cell = $(this[0]);
-    var gridHolder = cell.parents('.grid');
-
-    // Start our pulse
-    cell.addClass('animated pulse');
-    
-    var yCount = gridHolder.find('.row').length
-    // The number of cells per row should be the same in a given grid, so we
-    // find the number of divs with the class cell in the first row we find
-    var xCount = gridHolder.find('.row:first > .cell').length
-
-    // Our x location is our index in the row
-    var xLoc = cell.index();
-    // Our y location is our row's index in the grid
-    var yLoc = cell.parents('.row').index();
-
-    var furthest = Math.max(xCount-xLoc, yCount-yLoc);
-    for (var i = 0; i < 10; i++) {
-      (function (i) {
-        setTimeout(function () {
-          for (var x = -i; x <= i; x++) {
-            for (var y = -i; y <= i; y++) {
-              if ((x != 0 || y != 0)
-                  && (Math.abs(x) == i || Math.abs(y) == i)
-                  && xLoc+x >= 0
-                  && xLoc+x <= xCount
-                  && yLoc+y >= 0
-                  && yLoc+y <= yCount) {
-                var cell = gridHolder
-                             .find('.row:eq(' + (yLoc+y) + ')')
-                             .find('.cell:eq(' + (xLoc+x) + ')');
-                cell.addClass('animated pulse');
-              }
-            }
-          }
-      }, Math.pow(i,0.5)*100)})(i);
-    }
   }
 });
 
@@ -217,24 +196,29 @@ function loadGrids(gridData) {
 
   // Start at -1 because the first one goes in the main grid
   var miniGridCount = -1;
-  for (var gridName in gridData) {
-    if (gridData.hasOwnProperty(gridName)) {
+  var grids = gridData.Grids;
+  var instruments = gridData.Instruments;
+  
+  for (var gridName in grids) {
+    if (grids.hasOwnProperty(gridName)) {
       miniGridCount++;
     }
   }
 
   var isMainGrid = true;
-  for (var gridName in gridData) {
-    if (gridData.hasOwnProperty(gridName)) {
+  for (var gridName in grids) {
+    var grid = grids[gridName];
+    var displayName = instruments[grid.Index].Name;
+    if (grids.hasOwnProperty(gridName)) {
       // Fill the main grid first
       if (isMainGrid) {
         isMainGrid = false;
-        mainGrid.loadGrid(gridName, gridData[gridName]);
+        mainGrid.loadGrid(gridName, displayName, grids[gridName].Grid);
       } else {
         var miniGrid = $('<div class="mini-grid grid"></div>');
         miniGrids.append(miniGrid);
         miniGrid.width(Math.ceil(miniGrids.width()/miniGridCount) - miniMargin);
-        miniGrid.loadGrid(gridName, gridData[gridName]);
+        miniGrid.loadGrid(gridName, displayName, grids[gridName].Grid);
       }
     }
   }
@@ -254,15 +238,18 @@ function initWebsockets() {
         // Parse the JSON out of the data
         var data = JSON.parse(evt.data);
 
-        if (data.id == id) {
-          requestCount++;
-          requestTime += (Date.now() - data.sent);
-          console.log("Running average: " + requestTime/requestCount);
+        if (data.type == 'tap') {
+          if (data.id == id) {
+            var requestTime = (Date.now() - data.sent);
+            $.post('/avg', {requestDuration: requestTime});
+          }
+          // Select our grid by the name passed to us
+          var grid = $(nameAsCssClass(data.name));
+          // Use the other attributes to figure out which cell to set
+          grid.setBlock(data.x, data.y, data.on);
+        } else if (data.type == 'preset') {
+          loadGrids(data.GridData);
         }
-        // Select our grid by the name passed to us
-        var grid = $(nameAsCssClass(data.name));
-        // Use the other attributes to figure out which cell to set
-        grid.setBlock(data.x, data.y, data.on);
       }
   } else {
       // Your browser does not support WebSockets
@@ -301,6 +288,9 @@ function swapGrids(grid1, grid2) {
   var name1 = grid1.data('name');
   var name2 = grid2.data('name');
 
+  var dName1 = grid1.data('display-name');
+  var dName2 = grid2.data('display-name');
+
   grid1.removeClass(nameToClass(name1));
   grid2.removeClass(nameToClass(name2));
 
@@ -309,6 +299,9 @@ function swapGrids(grid1, grid2) {
 
   grid1.data('name', name2);
   grid2.data('name', name1);
+
+  grid1.data('display-name', dName2);
+  grid2.data('display-name', dName1);
 
   var html1 = grid1.html();
   grid1.html(grid2.html());

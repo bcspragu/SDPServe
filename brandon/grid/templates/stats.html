@@ -1,0 +1,19 @@
+{{ template "header" . }}
+<div class="container stats">
+  <div class="row">
+    <div class="col-sm-offset-1 col-sm-10">
+      <h1>Average Response: <span class="average-resp">{{ .AverageResp }}</span></h1>
+      <h1>Active Users: <span class="active-users">{{ .ActiveUsers }}</span></h1>
+      <h1>Total Clicks: <span class="total-clicks">{{ .TotalClicks }}</span></h1>
+      {{ range $name, $count := .GridClicks }}
+        <div class="row">
+          <div class="col-sm-offset-1 col-sm-11">
+            <h2>{{ $name }} Clicks: <span class="inst-clicks" data-name="{{ $name }}">{{ $count }}</span></h2>
+          </div>
+        </div>
+      {{ end }}
+    </div>
+  </div>
+</div>
+<script src="/js/stats.js"></script>
+{{ template "footer" .}}

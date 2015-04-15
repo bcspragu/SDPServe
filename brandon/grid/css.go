@@ -1,22 +1,27 @@
 package main
 
 import (
-	"strings"
+	"log"
+	"net/http"
+	"text/template"
 )
 
-var cssGridColors = make(map[string]State)
+var css = template.Must(template.ParseGlob("templates/*.css"))
 
-type State struct {
-	On  string
-	Off string
-}
-
-func initCss() {
-	for _, sig := range gridSignatures {
-		cssGridColors[nameAsCssClass(sig.Name)] = State{sig.OnColor, sig.OffColor}
+func serveCSS(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", 405)
+		return
 	}
-}
+	w.Header().Set("Content-Type", "text/css")
 
-func nameAsCssClass(name string) string {
-	return "." + strings.Replace(name, " ", "-", -1) + "-grid"
+	data := struct {
+		BaseResponse
+	}{
+		newResponse(r),
+	}
+	err := css.ExecuteTemplate(w, "main.css", data)
+	if err != nil {
+		log.Println("Error executing template:", err)
+	}
 }
