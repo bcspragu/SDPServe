@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -48,4 +50,27 @@ func initGrids() {
 
 func (g GridDef) AsCSSClass() string {
 	return "." + strings.Replace(g.Name, " ", "-", -1) + "-grid"
+}
+
+func GridState() string {
+	var data bytes.Buffer
+
+	keys := []string{}
+	for k, _ := range grids {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		for _, notes := range grids[key].Grid {
+			for _, note := range notes {
+				if note {
+					data.WriteString("1")
+				} else {
+					data.WriteString("0")
+				}
+			}
+		}
+	}
+	return data.String()
 }

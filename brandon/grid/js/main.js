@@ -12,6 +12,7 @@ var fadeTime = 100;
 var id;
 
 var dragging = false;
+var lastElement = null;
 var mode = false;
 
 $(function () {
@@ -24,16 +25,19 @@ $(function () {
   initWebsockets();
 
   // When we click on the main grid, we want to update the grid locally and on the server
-  $('.main-grid').on('mousedown touchstart', '.cell', function (e) {
+  $('.main-grid').on('mousedown', '.cell', function (e) {
     e.preventDefault();
-    mode = !$(this).hasClass('active');
-    $(this).cellTrigger();
+    var cell = realCell($(this));
+
+    mode = !cell.hasClass('active');
+    lastElement = cell;
+    cell.cellTrigger();
   });
 
   $('.main-grid').on('mouseover', '.cell', function (e) {
     e.preventDefault();
     if (dragging) {
-      $(this).cellTrigger();
+      realCell($(this)).cellTrigger();
     }
   });
 
@@ -63,21 +67,25 @@ $(function () {
     for (var i = 0; i < touches.length; i++) {
       var x = touches[i].pageX;
       var y = touches[i].pageY;
-      var touch = $(document.elementFromPoint(x,y));
+      var touch = realCell($(document.elementFromPoint(x,y)));
+
       // If we didn't click on a cell, ignore it
-      if (touch.parents('.main-grid').length > 0) {
+      if (touch != null && !touch.is(lastElement) && touch.parents('.main-grid').length > 0) {
+        lastElement = touch;
         touch.cellTrigger();
       }
     }
   });
 
-  $('.mini-grids').on('click', '.mini-grid', function () {
+  $('.mini-grids').on('mousedown', '.mini-grid', function () {
     // Switch this minigrid with the full-size grid
     swapGrids($(this), mainGrid);
   });
 
   // Load up all of the grids at the start
   loadGrids(startGrid);
+  initTouch();
+  setInterval(sync, 2500);
 });
 
 jQuery.fn.extend({
@@ -162,9 +170,6 @@ jQuery.fn.extend({
   // Gets cell parent grid and coordinates and state, then sends it to server
   cellTrigger: function () {
     var cell = $(this[0]);
-    if (cell.hasClass('.cell-inner')) {
-      cell = cell.parents('.cell');
-    }
 
     if (mode) {
       cell.addClass('active', fadeTime);
@@ -185,6 +190,15 @@ jQuery.fn.extend({
     conn.send(message);
   }
 });
+
+function realCell(cell) {
+  if (cell.hasClass('cell-inner')) {
+    return cell.parents('.cell');
+  } else if (cell.hasClass('cell')) {
+    return cell;
+  }
+  return null;
+}
 
 // Initialize our grids. The first grid takes up the large main grid area, and all subsequent grids get spread out along the bottom
 function loadGrids(gridData) {
@@ -316,4 +330,62 @@ function makeID () {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
 
   return text;
+}
+
+function touchHandler(event) {
+    var touch = event.changedTouches[0];
+
+    var simulatedEvent = document.createEvent("MouseEvent");
+        simulatedEvent.initMouseEvent({
+        touchstart: "mousedown",
+        touchmove: "mousemove",
+        touchend: "mouseup"
+    }[event.type], true, true, window, 1,
+        touch.screenX, touch.screenY,
+        touch.clientX, touch.clientY, false,
+        false, false, false, 0, null);
+
+    touch.target.dispatchEvent(simulatedEvent);
+    event.preventDefault();
+}
+
+function initTouch() {
+    document.addEventListener("touchstart", touchHandler, true);
+    document.addEventListener("touchmove", touchHandler, true);
+    document.addEventListener("touchend", touchHandler, true);
+    document.addEventListener("touchcancel", touchHandler, true);
+}
+
+function sync() {
+  $.get('/state', function(data) {
+    var hash = getState();
+    if (data == hash) {
+      // Do nothing, we're good
+    } else {
+      // Resync game state from server
+    }
+  });
+}
+
+function getState() {
+  var names = [];
+  $('.grid').each(function() {
+    names.push($(this).data('name'));
+  });
+  names.sort();
+
+  var str = "";
+  for (var i = 0; i < names.length; i++) {
+    var grid = $(nameAsCssClass(names[i]));
+    grid.find('.row').each(function() {
+      $(this).find('.cell').each(function() {
+        if ($(this).hasClass('active')) {
+          str += "1";
+        } else {
+          str += "0";
+        }
+      });
+    });
+  }
+  return str;
 }

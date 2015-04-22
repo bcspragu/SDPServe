@@ -73,7 +73,7 @@ func main() {
 
 	// Grid state endpoint
 	http.HandleFunc("/grids.json", serveGrids)
-	http.HandleFunc("/preset", saveGrids)
+	http.HandleFunc("/state", serveState)
 
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./js"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
