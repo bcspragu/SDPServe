@@ -159,10 +159,10 @@ jQuery.fn.extend({
     var height = gridHolder.height();
 
     // The number of rows is the number of divs with the class row
-    var rowCount = gridHolder.find('.row').length
+    var rowCount = gridHolder.find('.row').length;
     // The number of cells per row should be the same in a given grid, so we
     // find the number of divs with the class cell in the first row we find
-    var cellCount = gridHolder.find('.row:first > .cell').length
+    var cellCount = gridHolder.find('.row:first > .cell').length;
 
     gridHolder.find('.row').height(Math.floor(height/rowCount));
     gridHolder.find('.cell').width(Math.floor(width/cellCount));
@@ -288,11 +288,11 @@ function resizeGrids() {
 
 // A helper function for turning our instrument names into classes
 function nameToClass(name) {
-  return name.replace(" ", "-") + "-grid"
+  return name.replace(" ", "-") + "-grid";
 }
 
 function nameAsCssClass(name) {
-  return "." + name.replace(" ", "-") + "-grid"
+  return "." + name.replace(" ", "-") + "-grid";
 }
 
 // Switch out the grids
@@ -326,8 +326,9 @@ function makeID () {
   var text = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-  for( var i=0; i < 5; i++ )
+  for( var i=0; i < 5; i++ ) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
 
   return text;
 }
@@ -358,11 +359,12 @@ function initTouch() {
 
 function sync() {
   $.get('/state', function(data) {
-    var hash = getState();
-    if (data == hash) {
+    var state = getState();
+    if (data == state) {
       // Do nothing, we're good
     } else {
       // Resync game state from server
+      setState(state.split(","), data.split(","));
     }
   });
 }
@@ -386,6 +388,36 @@ function getState() {
         }
       });
     });
+    if (i != names.length - 1) {
+      str += ",";
+    }
   }
   return str;
+}
+
+function setState(current, actual) {
+  var names = [];
+  $('.grid').each(function() {
+    names.push($(this).data('name'));
+  });
+  names.sort();
+
+  for (var i = 0; i < names.length; i++) {
+    var grid = $(nameAsCssClass(names[i]));
+    var index = 0;
+    grid.find('.row').each(function() {
+      $(this).find('.cell').each(function() {
+        // If the states don't match
+        if (current[i][index] != actual[i][index]) {
+          if (actual[i][index] == "1") {
+            $(this).addClass("active");
+          } else {
+            $(this).removeClass("active");
+          }
+          $(this).addClass("animated pulse");
+        }
+        index++;
+      });
+    });
+  }
 }

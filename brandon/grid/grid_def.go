@@ -61,15 +61,18 @@ func GridState() string {
 	}
 	sort.Strings(keys)
 
-	for _, key := range keys {
-		for _, notes := range grids[key].Grid {
-			for _, note := range notes {
-				if note {
+	for i, key := range keys {
+		for j, notes := range grids[key].Grid {
+			for k := range notes {
+				if grids[key].Grid[k][j] {
 					data.WriteString("1")
 				} else {
 					data.WriteString("0")
 				}
 			}
+		}
+		if i != len(keys)-1 {
+			data.WriteString(",")
 		}
 	}
 	return data.String()
