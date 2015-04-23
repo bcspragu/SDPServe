@@ -21,7 +21,9 @@ type StatMessage struct {
 	CumulativeAverage string
 	RunningAverage    string
 	Median            string
+	Mode              string
 	TotalClicks       int
+	ActiveUsers       int
 }
 
 func addTime(w http.ResponseWriter, r *http.Request) {
@@ -71,12 +73,30 @@ func (s Stats) CumulativeAverage() string {
 	return strconv.FormatFloat(s.TotalResponseTime()/float64(len(s.ResponseTimes)), 'f', 3, 64) + " ms"
 }
 
-func (s Stats) MedianResponse() string {
+func (s Stats) Median() string {
 	if len(s.ResponseTimes) == 0 {
 		return "No clicks yet"
 	}
 	sort.Ints(s.ResponseTimes)
 	return strconv.Itoa(s.ResponseTimes[len(s.ResponseTimes)/2]) + " ms"
+}
+
+func (s Stats) Mode() string {
+	if len(s.ResponseTimes) == 0 {
+		return "No clicks yet"
+	}
+
+	count := make(map[int]int)
+	for _, time := range s.ResponseTimes {
+		count[time]++
+	}
+	mode, freq := 0, 0
+	for time, f := range count {
+		if f > freq {
+			mode = time
+		}
+	}
+	return strconv.Itoa(mode) + " ms"
 }
 
 func (s Stats) RunningAverage() string {
@@ -114,6 +134,17 @@ func (s Stats) TotalClicks() int {
 }
 
 func broadcastStats() {
-	statString, _ := json.Marshal(StatMessage{"stat", stats.CumulativeAverage(), stats.RunningAverage(), stats.MedianResponse(), stats.TotalClicks()})
+	statString, _ := json.Marshal(StatMessage{
+		Type: "stat",
+
+		CumulativeAverage: stats.CumulativeAverage(),
+		RunningAverage:    stats.RunningAverage(),
+
+		Median: stats.Median(),
+		Mode:   stats.Mode(),
+
+		TotalClicks: stats.TotalClicks(),
+		ActiveUsers: stats.ActiveUsers,
+	})
 	h.broadcast <- statString
 }

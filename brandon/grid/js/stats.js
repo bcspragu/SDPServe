@@ -1,4 +1,21 @@
+var chart;
+
+var cumAverageData = [];
+var runAverageData = [];
+var modeData = [];
+var medianData = [];
+
+var seriesOptions = [
+  { strokeStyle: 'rgba(255, 0, 0, 1)', fillStyle: 'rgba(255, 0, 0, 0.1)', lineWidth: 3 },
+  { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.1)', lineWidth: 3 },
+  { strokeStyle: 'rgba(0, 0, 255, 1)', fillStyle: 'rgba(0, 0, 255, 0.1)', lineWidth: 3 },
+  { strokeStyle: 'rgba(255, 255, 0, 1)', fillStyle: 'rgba(255, 255, 0, 0.1)', lineWidth: 3 }
+];
+
+var dataSets = [new TimeSeries(), new TimeSeries(), new TimeSeries(), new TimeSeries()];
+
 $(function() {
+  initGraph();
   $('.stats').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', '*', function() {
     var elem = $(this);
     if (elem.hasClass('pulse-big')) {
@@ -22,11 +39,16 @@ $(function() {
           return;
         }
 
+        addData([getFloat(data.CumulativeAverage), getFloat(data.RunningAverage), getInt(data.Median), getInt(data.Mode)])
+
         $('.total-clicks').bounce(data.TotalClicks);
         $('.active-users').bounce(data.ActiveUsers);
 
         $('.run-average-resp').bounce(data.RunningAverage);
         $('.cum-average-resp').bounce(data.CumulativeAverage);
+
+        $('.median-resp').bounce(data.Median);
+        $('.mode-resp').bounce(data.Mode);
 
         for (var gridName in data.GridClicks) {
           if (data.GridClicks.hasOwnProperty(gridName)) {
@@ -51,3 +73,27 @@ jQuery.fn.extend({
     elem.text(text);
   }
 });
+
+function initGraph() {
+
+  // Build the timeline
+  var timeline = new SmoothieChart({ millisPerPixel: 20, grid: { strokeStyle: '#555555', lineWidth: 1, millisPerLine: 1000, verticalSections: 4 }});
+  for (var i = 0; i < dataSets.length; i++) {
+    timeline.addTimeSeries(dataSets[i], seriesOptions[i]);
+  }
+  timeline.streamTo($('#chart').get(0), 1000);
+}
+
+function addData(data) {
+  for (var i = 0; i < dataSets.length; i++) {
+    dataSets[i].append(new Date().getTime(), data[i]);
+  }
+}
+
+function getInt(str) {
+  return parseInt(str.split(" ")[0]);
+}
+
+function getFloat(str) {
+  return parseFloat(str.split(" ")[0]);
+}
