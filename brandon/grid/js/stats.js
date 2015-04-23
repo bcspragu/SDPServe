@@ -1,10 +1,5 @@
 var chart;
 
-var cumAverageData = [];
-var runAverageData = [];
-var modeData = [];
-var medianData = [];
-
 var seriesOptions = [
   { strokeStyle: 'rgba(255, 0, 0, 1)', fillStyle: 'rgba(255, 0, 0, 0.1)', lineWidth: 3 },
   { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.1)', lineWidth: 3 },
@@ -39,7 +34,7 @@ $(function() {
           return;
         }
 
-        addData([getFloat(data.CumulativeAverage), getFloat(data.RunningAverage), getInt(data.Median), getInt(data.Mode)])
+        addData([getFloat(data.CumulativeAverage), getFloat(data.RunningAverage), getInt(data.Median)]);
 
         $('.total-clicks').bounce(data.TotalClicks);
         $('.active-users').bounce(data.ActiveUsers);
@@ -49,6 +44,9 @@ $(function() {
 
         $('.median-resp').bounce(data.Median);
         $('.mode-resp').bounce(data.Mode);
+
+        $('.max-resp').bounce(data.Max);
+        $('.min-resp').bounce(data.Min);
 
         for (var gridName in data.GridClicks) {
           if (data.GridClicks.hasOwnProperty(gridName)) {
@@ -60,6 +58,7 @@ $(function() {
   } else {
       // Your browser does not support WebSockets
   }
+
 });
 
 jQuery.fn.extend({
@@ -75,6 +74,7 @@ jQuery.fn.extend({
 });
 
 function initGraph() {
+  $('#chart').attr('width', $('.chart-holder').width());
 
   // Build the timeline
   var timeline = new SmoothieChart({ millisPerPixel: 20, grid: { strokeStyle: '#555555', lineWidth: 1, millisPerLine: 1000, verticalSections: 4 }});
@@ -82,6 +82,10 @@ function initGraph() {
     timeline.addTimeSeries(dataSets[i], seriesOptions[i]);
   }
   timeline.streamTo($('#chart').get(0), 1000);
+
+  $(window).resize(function() {
+    $('#chart').attr('width', $('.chart-holder').width());
+  });
 }
 
 function addData(data) {

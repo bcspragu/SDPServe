@@ -169,3 +169,7 @@ h1, h2, .icon {
           animation-name: fadeOut;
 }
 
+
+#chart {
+  margin: 0 auto;
+}
