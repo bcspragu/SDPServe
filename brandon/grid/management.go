@@ -18,7 +18,7 @@ func serveManagement(w http.ResponseWriter, r *http.Request) {
 		Settings
 		Presets map[string]Preset
 	}{
-		newResponseBS(r),
+		newResponse(r, "bootstrap", "bootstrap-select"),
 		settings,
 		presets(),
 	}
@@ -34,12 +34,15 @@ func serveSettings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
+	newSettings := settings
+	for i, inst := range newSettings.Instruments {
+		newSettings.Instruments[i].Velocity = inst.Velocity * settings.MasterVolume / 100
+	}
 	gridString, _ := json.Marshal(Preset{settings, grids})
 	fmt.Fprint(w, string(gridString))
 }
 
 func setSettings(w http.ResponseWriter, r *http.Request) {
-	resp := make(map[string]string)
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", 405)
 		return
@@ -51,6 +54,10 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 		case "duration":
 			if d, err := strconv.Atoi(val); err == nil {
 				settings.Duration = d
+			}
+		case "master":
+			if d, err := strconv.Atoi(val); err == nil {
+				settings.MasterVolume = d
 			}
 		case "snapshot":
 			savePreset(val, Preset{settings, grids}, nil)
@@ -68,9 +75,9 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 			for i, inst := range settings.Instruments {
 				if id == inst.ID {
 					settings.Instruments[i].Instrument = instruments[newID]
-					resp["newName"] = instruments[newID].Name
 				}
 			}
+			broadcastData()
 		case "preset":
 			p := presets()[val]
 			settings = p.Settings
@@ -78,10 +85,19 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 			broadcastData()
 		}
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	respString, _ := json.Marshal(resp)
-	fmt.Fprint(w, string(respString))
+	data := struct {
+		BaseResponse
+		Settings
+		Presets map[string]Preset
+	}{
+		newResponse(r, "bootstrap", "bootstrap-select"),
+		settings,
+		presets(),
+	}
+	err := templates.ExecuteTemplate(w, "management_partial.html", data)
+	if err != nil {
+		log.Println("Error executing template:", err)
+	}
 }
 
 func (p Preset) SettingsJSON() (string, error) {

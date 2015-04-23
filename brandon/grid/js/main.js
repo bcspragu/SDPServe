@@ -94,6 +94,7 @@ jQuery.fn.extend({
   loadGrid: function (gridName, displayName, gridData) {
     // Selector should only have a single element
     var gridHolder = $(this[0]);
+    gridHolder.empty();
     // Store the name of the grid on the holder
     gridHolder.data("name", gridName);
     gridHolder.data("display-name", displayName);
@@ -202,9 +203,10 @@ function realCell(cell) {
 
 // Initialize our grids. The first grid takes up the large main grid area, and all subsequent grids get spread out along the bottom
 function loadGrids(gridData) {
-  // Clear out anything in there
-  mainGrid.empty();
-  miniGrids.empty();
+  var isNew = false;
+  if (mainGrid.is(':empty')) {
+    isNew = true;
+  }
 
   // Start at -1 because the first one goes in the main grid
   var miniGridCount = -1;
@@ -222,15 +224,20 @@ function loadGrids(gridData) {
     var grid = grids[gridName];
     var displayName = instruments[grid.Index].Name;
     if (grids.hasOwnProperty(gridName)) {
-      // Fill the main grid first
-      if (isMainGrid) {
-        isMainGrid = false;
-        mainGrid.loadGrid(gridName, displayName, grids[gridName].Grid);
+      if (isNew) {
+        // Fill the main grid first
+        if (isMainGrid) {
+          isMainGrid = false;
+          mainGrid.loadGrid(gridName, displayName, grids[gridName].Grid);
+        } else {
+          var miniGrid = $('<div class="mini-grid grid"></div>');
+          miniGrids.append(miniGrid);
+          miniGrid.width(Math.floor(miniGrids.width()/miniGridCount));
+          miniGrid.loadGrid(gridName, displayName, grids[gridName].Grid);
+        }
       } else {
-        var miniGrid = $('<div class="mini-grid grid"></div>');
-        miniGrids.append(miniGrid);
-        miniGrid.width(Math.floor(miniGrids.width()/miniGridCount));
-        miniGrid.loadGrid(gridName, displayName, grids[gridName].Grid);
+          var displayName = instruments[grid.Index].Name;
+          $(nameAsCssClass(gridName)).loadGrid(gridName, displayName, grids[gridName].Grid);
       }
     }
   }
@@ -253,7 +260,7 @@ function initWebsockets() {
         if (data.type == 'tap') {
           if (data.id == id) {
             var requestTime = (Date.now() - data.sent);
-            $.post('/avg', {requestDuration: requestTime});
+            $.post('/time', {requestDuration: requestTime});
           }
           // Select our grid by the name passed to us
           var grid = $(nameAsCssClass(data.name));

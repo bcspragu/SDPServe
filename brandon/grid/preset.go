@@ -12,8 +12,9 @@ type Preset struct {
 }
 
 type Settings struct {
-	Duration    int
-	Instruments []ActiveInstrument
+	MasterVolume int
+	Duration     int
+	Instruments  []ActiveInstrument
 }
 
 type Instrument struct {
@@ -28,7 +29,7 @@ type ActiveInstrument struct {
 }
 
 func DefaultPreset() Preset {
-	preset := Preset{Settings: Settings{Duration: 50}}
+	preset := Preset{Settings: Settings{Duration: 50, MasterVolume: 100}}
 	preset.Instruments = []ActiveInstrument{
 		{instruments[0], 100},
 		{instruments[24], 100},

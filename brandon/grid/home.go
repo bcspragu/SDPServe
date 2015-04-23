@@ -14,7 +14,7 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", 405)
 		return
 	}
-	err := templates.ExecuteTemplate(w, "home.html", newResponse(r))
+	err := templates.ExecuteTemplate(w, "home.html", newResponse(r, "main"))
 	if err != nil {
 		log.Println("Error executing template:", err)
 	}
