@@ -48,6 +48,7 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	r.ParseForm()
+	id := r.PostFormValue("id")
 	for field := range r.PostForm {
 		val := r.PostFormValue(field)
 		switch field {
@@ -62,7 +63,7 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 		case "snapshot":
 			savePreset(val, Preset{settings, grids}, nil)
 		case "velocity":
-			id, _ := strconv.Atoi(r.PostFormValue("id"))
+			id, _ := strconv.Atoi(r.PostFormValue("vID"))
 			vel, _ := strconv.Atoi(val)
 			for i, inst := range settings.Instruments {
 				if id == inst.ID {
@@ -70,7 +71,7 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		case "instrumentID":
-			id, _ := strconv.Atoi(r.PostFormValue("id"))
+			id, _ := strconv.Atoi(r.PostFormValue("oldID"))
 			newID, _ := strconv.Atoi(val)
 			for i, inst := range settings.Instruments {
 				if id == inst.ID {
@@ -85,6 +86,7 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 			broadcastData()
 		}
 	}
+	broadcastPage(r, id)
 	data := struct {
 		BaseResponse
 		Settings
@@ -114,6 +116,18 @@ func broadcastData() {
 		Preset{settings, grids},
 	}
 
+	dataString, _ := json.Marshal(data)
+	h.broadcast <- dataString
+}
+
+func broadcastPage(r *http.Request, id string) {
+	data := struct {
+		Type string `json:"type"`
+		ID   string `json:"id"`
+	}{
+		"management",
+		id,
+	}
 	dataString, _ := json.Marshal(data)
 	h.broadcast <- dataString
 }
