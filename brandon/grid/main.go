@@ -16,9 +16,9 @@ import (
 var (
 	templates   = template.Must(template.ParseGlob("templates/*.html"))
 	stats       = Stats{GridClicks: make(map[string]int64)}
-	settings    = Settings{Duration: 100}
 	instruments []Instrument
 	db          *bolt.DB
+	settings    Settings
 )
 
 type WSMessage struct {
@@ -55,7 +55,7 @@ func main() {
 	http.HandleFunc("/", serveHome)
 
 	// Update the average response time
-	http.HandleFunc("/avg", saveAverage)
+	http.HandleFunc("/time", addTime)
 	// View realtime usage statistics
 	http.HandleFunc("/stats", serveStats)
 
@@ -73,7 +73,7 @@ func main() {
 
 	// Grid state endpoint
 	http.HandleFunc("/grids.json", serveGrids)
-	http.HandleFunc("/preset", saveGrids)
+	http.HandleFunc("/state", serveState)
 
 	//http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./js"))))
 	//http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
@@ -150,6 +150,7 @@ func initDB() {
 			dec.Decode(&def)
 		}
 		settings = def.Settings
+		grids = def.Grids
 
 		return err
 	})

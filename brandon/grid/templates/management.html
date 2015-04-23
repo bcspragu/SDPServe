@@ -1,35 +1,11 @@
 {{ template "header" . }}
 <div class="container">
+  <div class="alert alert-warning hide" role="alert"></div>
   <h1>Management Console</h1>
-  <div class="row duration">
-    <div class="col-sm-1"><span class="icon icon-right glyphicon glyphicon-download" aria-hidden="true"></span></div>
-    <div class="col-sm-10">
-      <div class="progress">
-        <div class="center progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: {{ .Duration }}%"></div>
-      </div>
-    </div>
-    <div class="col-sm-1"><span class="icon icon-left glyphicon glyphicon-upload" aria-hidden="true"></span></div>
-  </div>
-  {{ range $i, $inst := .Instruments }}
-    {{ if ne $inst.ID -1 }}
-      {{ template "instrument_partial" $inst }}
-    {{ end }}
-  {{ end }}
-  <div class="row form-horizontal">
-    <div class="col-sm-3">
-      <input type="text" class="form-control preset-name" placeholder="Preset Name"/>
-    </div>
-    <div class="col-sm-3"><a class="snapshot btn btn-primary btn-block">Save Preset</a></div>
-    <div class="col-sm-3">
-      <select name="select" class="form-control preset-select">
-        {{ range $name, $preset := .Presets }}
-        <option value="{{ $name }}" data-info="{{ $preset.SettingsJSON }}" {{ if eq $name "Default" }} selected {{ end }}>{{ $name }}</option> 
-        {{ end }}
-      </select>
-    </div>
-    <div class="col-sm-3"><a class="load-preset btn btn-primary btn-block">Load Preset</a></div>
+  <div class="management">
+    {{ template "management_partial" . }}
   </div>
 </div>
 <script src="/js/bootstrap-select.js"></script>
 <script src="/js/management.js"></script>
-{{ template "footer" .}}
+{{ template "footer" . }}

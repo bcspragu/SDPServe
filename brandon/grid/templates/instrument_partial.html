@@ -1,6 +1,6 @@
 {{ define "instrument_partial" }}
 <div class="row instrument" data-id="{{ .ID }}">
-  <div class="col-sm-3"><h2 class="instrument-name">{{ .Name }}</h2></div>
+  <div class="col-sm-4"><h2 class="instrument-name">{{ .Name }}</h2></div>
   <div class="col-sm-4">
     <div class="row">
       <div class="col-sm-2"><span class="icon icon-right glyphicon glyphicon-volume-down" aria-hidden="true"></span></div>
@@ -12,13 +12,12 @@
       <div class="col-sm-2"><span class="icon icon-left glyphicon glyphicon-volume-up" aria-hidden="true"></span></div>
     </div>
   </div>
-  <div class="col-sm-3">
+  <div class="col-sm-4">
     <select name="select" class="instrument-select">
       {{ range $j, $in := .Similar }}
         <option value="{{ $in.ID }}" {{ if eq $.Name $in.Name }} selected {{ end }}>{{ $in.Name }}</option> 
       {{ end }}
     </select>
   </div>
-  <div class="col-sm-2"><a class="change-instrument btn btn-primary btn-block">Change Instrument</a></div>
 </div>
 {{ end }}

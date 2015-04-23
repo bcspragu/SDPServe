@@ -24,7 +24,10 @@ $(function() {
 
         $('.total-clicks').bounce(data.TotalClicks);
         $('.active-users').bounce(data.ActiveUsers);
-        $('.average-resp').bounce(data.AverageResp);
+
+        $('.run-average-resp').bounce(data.RunningAverage);
+        $('.cum-average-resp').bounce(data.CumulativeAverage);
+
         for (var gridName in data.GridClicks) {
           if (data.GridClicks.hasOwnProperty(gridName)) {
             $('[data-name="' + gridName + '"]').bounce(data.GridClicks[gridName]);

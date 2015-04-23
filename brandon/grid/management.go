@@ -18,7 +18,7 @@ func serveManagement(w http.ResponseWriter, r *http.Request) {
 		Settings
 		Presets map[string]Preset
 	}{
-		newResponseBS(r),
+		newResponse(r, "bootstrap", "bootstrap-select"),
 		settings,
 		presets(),
 	}
@@ -34,17 +34,21 @@ func serveSettings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
+	newSettings := settings
+	for i, inst := range newSettings.Instruments {
+		newSettings.Instruments[i].Velocity = inst.Velocity * settings.MasterVolume / 100
+	}
 	gridString, _ := json.Marshal(Preset{settings, grids})
 	fmt.Fprint(w, string(gridString))
 }
 
 func setSettings(w http.ResponseWriter, r *http.Request) {
-	resp := make(map[string]string)
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", 405)
 		return
 	}
 	r.ParseForm()
+	id := r.PostFormValue("id")
 	for field := range r.PostForm {
 		val := r.PostFormValue(field)
 		switch field {
@@ -52,10 +56,14 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 			if d, err := strconv.Atoi(val); err == nil {
 				settings.Duration = d
 			}
+		case "master":
+			if d, err := strconv.Atoi(val); err == nil {
+				settings.MasterVolume = d
+			}
 		case "snapshot":
 			savePreset(val, Preset{settings, grids}, nil)
 		case "velocity":
-			id, _ := strconv.Atoi(r.PostFormValue("id"))
+			id, _ := strconv.Atoi(r.PostFormValue("vID"))
 			vel, _ := strconv.Atoi(val)
 			for i, inst := range settings.Instruments {
 				if id == inst.ID {
@@ -63,14 +71,14 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		case "instrumentID":
-			id, _ := strconv.Atoi(r.PostFormValue("id"))
+			id, _ := strconv.Atoi(r.PostFormValue("oldID"))
 			newID, _ := strconv.Atoi(val)
 			for i, inst := range settings.Instruments {
 				if id == inst.ID {
 					settings.Instruments[i].Instrument = instruments[newID]
-					resp["newName"] = instruments[newID].Name
 				}
 			}
+			broadcastData()
 		case "preset":
 			p := presets()[val]
 			settings = p.Settings
@@ -78,10 +86,20 @@ func setSettings(w http.ResponseWriter, r *http.Request) {
 			broadcastData()
 		}
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	respString, _ := json.Marshal(resp)
-	fmt.Fprint(w, string(respString))
+	broadcastPage(r, id)
+	data := struct {
+		BaseResponse
+		Settings
+		Presets map[string]Preset
+	}{
+		newResponse(r, "bootstrap", "bootstrap-select"),
+		settings,
+		presets(),
+	}
+	err := templates.ExecuteTemplate(w, "management_partial.html", data)
+	if err != nil {
+		log.Println("Error executing template:", err)
+	}
 }
 
 func (p Preset) SettingsJSON() (string, error) {
@@ -98,6 +116,18 @@ func broadcastData() {
 		Preset{settings, grids},
 	}
 
+	dataString, _ := json.Marshal(data)
+	h.broadcast <- dataString
+}
+
+func broadcastPage(r *http.Request, id string) {
+	data := struct {
+		Type string `json:"type"`
+		ID   string `json:"id"`
+	}{
+		"management",
+		id,
+	}
 	dataString, _ := json.Marshal(data)
 	h.broadcast <- dataString
 }
