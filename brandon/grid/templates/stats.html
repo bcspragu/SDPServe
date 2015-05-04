@@ -3,6 +3,13 @@
   <div class="row">
     <h1>Running Average Response: <span class="run-average-resp">{{ .RunningAverage }}</span></h1>
     <h1>Cumulative Average Response: <span class="cum-average-resp">{{ .CumulativeAverage }}</span></h1>
+
+    <h1>Median Response: <span class="median-resp">{{ .Median }}</span></h1>
+    <h1>Mode Response: <span class="mode-resp">{{ .Mode }}</span></h1>
+
+    <h1>Max Response: <span class="max-resp">{{ .Max }}</span></h1>
+    <h1>Min Response: <span class="min-resp">{{ .Min }}</span></h1>
+
     <h1>Active Users: <span class="active-users">{{ .ActiveUsers }}</span></h1>
     <h1>Total Clicks: <span class="total-clicks">{{ .TotalClicks }}</span></h1>
     {{ range $name, $count := .GridClicks }}
@@ -13,6 +20,12 @@
       </div>
     {{ end }}
   </div>
+  <div class="row">
+    <div class="col-sm-12 chart-holder">
+      <canvas id="chart" width="750" height="500" width=></canvas>
+    </div>
+  </div>
 </div>
+<script src="/js/smoothie.js"></script>
 <script src="/js/stats.js"></script>
 {{ template "footer" .}}

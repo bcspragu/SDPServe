@@ -10,8 +10,8 @@ import (
 
 type Stats struct {
 	ResponseTimes []int
-	MinResponse   int
-	MaxResponse   int
+	Min           int
+	Max           int
 	GridClicks    map[string]int64
 	ActiveUsers   int
 }
@@ -21,7 +21,11 @@ type StatMessage struct {
 	CumulativeAverage string
 	RunningAverage    string
 	Median            string
+	Mode              string
 	TotalClicks       int
+	ActiveUsers       int
+	Min               string
+	Max               string
 }
 
 func addTime(w http.ResponseWriter, r *http.Request) {
@@ -35,12 +39,12 @@ func addTime(w http.ResponseWriter, r *http.Request) {
 		stats.ResponseTimes = append(stats.ResponseTimes, average)
 	}
 
-	if average < stats.MinResponse {
-		stats.MinResponse = average
+	if average < stats.Min || len(stats.ResponseTimes) == 1 {
+		stats.Min = average
 	}
 
-	if average > stats.MaxResponse {
-		stats.MaxResponse = average
+	if average > stats.Max {
+		stats.Max = average
 	}
 
 	broadcastStats()
@@ -71,12 +75,51 @@ func (s Stats) CumulativeAverage() string {
 	return strconv.FormatFloat(s.TotalResponseTime()/float64(len(s.ResponseTimes)), 'f', 3, 64) + " ms"
 }
 
-func (s Stats) MedianResponse() string {
+func (s Stats) Median() string {
 	if len(s.ResponseTimes) == 0 {
 		return "No clicks yet"
 	}
-	sort.Ints(s.ResponseTimes)
-	return strconv.Itoa(s.ResponseTimes[len(s.ResponseTimes)/2]) + " ms"
+
+	sorted := make([]int, len(s.ResponseTimes))
+	copy(sorted, s.ResponseTimes)
+	sort.Ints(sorted)
+
+	return strconv.Itoa(sorted[len(s.ResponseTimes)/2]) + " ms"
+}
+
+func (s Stats) MaxResponse() string {
+	if len(s.ResponseTimes) == 0 {
+		return "No clicks yet"
+	}
+
+	return strconv.Itoa(s.Max) + " ms"
+}
+
+func (s Stats) MinResponse() string {
+	if len(s.ResponseTimes) == 0 {
+		return "No clicks yet"
+	}
+
+	return strconv.Itoa(s.Min) + " ms"
+}
+
+func (s Stats) Mode() string {
+	if len(s.ResponseTimes) == 0 {
+		return "No clicks yet"
+	}
+
+	count := make(map[int]int)
+	for _, time := range s.ResponseTimes {
+		count[time]++
+	}
+	mode, freq := 0, 0
+	for time, f := range count {
+		if f > freq {
+			mode = time
+			freq = f
+		}
+	}
+	return strconv.Itoa(mode) + " ms"
 }
 
 func (s Stats) RunningAverage() string {
@@ -114,6 +157,20 @@ func (s Stats) TotalClicks() int {
 }
 
 func broadcastStats() {
-	statString, _ := json.Marshal(StatMessage{"stat", stats.CumulativeAverage(), stats.RunningAverage(), stats.MedianResponse(), stats.TotalClicks()})
+	statString, _ := json.Marshal(StatMessage{
+		Type: "stat",
+
+		CumulativeAverage: stats.CumulativeAverage(),
+		RunningAverage:    stats.RunningAverage(),
+
+		Median: stats.Median(),
+		Mode:   stats.Mode(),
+
+		TotalClicks: stats.TotalClicks(),
+		ActiveUsers: stats.ActiveUsers,
+
+		Max: stats.MaxResponse(),
+		Min: stats.MinResponse(),
+	})
 	h.broadcast <- statString
 }
