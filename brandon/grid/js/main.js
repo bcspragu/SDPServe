@@ -246,7 +246,7 @@ function loadGrids(gridData) {
 function initWebsockets() {
   // Establish a WebSocket connection
   if (window["WebSocket"]) {
-      conn = new WebSocket("ws://" + host + "/ws");
+      conn = new WebSocket("wss://" + host + "/ws");
       conn.onerror = function(evt) {
         console.log(evt);
       }
