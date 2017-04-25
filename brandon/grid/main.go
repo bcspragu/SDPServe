@@ -75,9 +75,13 @@ func main() {
 	http.HandleFunc("/grids.json", serveGrids)
 	http.HandleFunc("/state", serveState)
 
-	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./js"))))
-	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
-	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("./fonts"))))
+	env := os.Getenv("ENV")
+
+	if env == "development" {
+		http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./js"))))
+		http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
+		http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("./fonts"))))
+	}
 
 	port := os.Getenv("PORT")
 	if port == "" {
